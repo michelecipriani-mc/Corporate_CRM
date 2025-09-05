@@ -1,6 +1,6 @@
 package com.crm.corporate_crm.anagrafica.model;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.ElementCollection;
@@ -36,12 +36,14 @@ public class Utente {
 
     private String password; //attributo password 
 
+    private String refreshToken; //attributo per refreshare il Token
+
     @ManyToMany //vincolo Molti a Molti con l'entità ruoli
     //Riferimenti per la creazione della tabella N-M
     @JoinTable(name = "utenti_ruoli",
         joinColumns = {@JoinColumn(name = "UTENTE_ID", referencedColumnName = "ID")},
         inverseJoinColumns = {@JoinColumn(name = "RUOLO_ID", referencedColumnName = "ID")})
-    private List<Ruolo> ruoli; //lista dei ruoli associati all'utenete
+    private Set<Ruolo> ruoli = new HashSet<>(); //lista dei ruoli associati all'utenete
 
     @ElementCollection
     private Set<Long> annunci_id; //lista degli annunci a cui l'utente si è candidato
