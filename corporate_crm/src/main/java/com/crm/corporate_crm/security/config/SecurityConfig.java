@@ -12,7 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.crm.corporate_crm.security.JwtAuthFilter;
+import com.crm.corporate_crm.security.filter.JwtAuthFilter;
 
 /**
  * Configura la sicurezza dell'applicazione:
