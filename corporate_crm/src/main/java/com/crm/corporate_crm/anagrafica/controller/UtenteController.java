@@ -24,7 +24,7 @@ public class UtenteController {
 
     private final ModelMapper modelMapper;
 
-    @GetMapping("/${id}")
+    @GetMapping("/{id}")
     public UtenteInfoDto getById(@PathVariable Long id) {
         return modelMapper.map(utenteService.findById(id), UtenteInfoDto.class);
     }

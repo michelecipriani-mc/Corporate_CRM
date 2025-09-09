@@ -43,7 +43,7 @@ public class Utente {
     @JoinTable(name = "utenti_ruoli",
         joinColumns = {@JoinColumn(name = "UTENTE_ID", referencedColumnName = "ID")},
         inverseJoinColumns = {@JoinColumn(name = "RUOLO_ID", referencedColumnName = "ID")})
-    private Set<Ruolo> ruoli = new HashSet<>(); //lista dei ruoli associati all'utenete
+    private Set<Ruolo> ruoli = new HashSet<>(); //lista dei ruoli associati all'utente
 
     @ElementCollection
     private Set<Long> annunci_id; //lista degli annunci a cui l'utente si è candidato

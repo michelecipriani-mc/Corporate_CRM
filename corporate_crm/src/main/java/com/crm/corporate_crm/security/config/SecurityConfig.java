@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -12,7 +13,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.crm.corporate_crm.anagrafica.service.CustomUserDetailsService;
 import com.crm.corporate_crm.security.filter.JwtAuthFilter;
 
 /**
@@ -25,11 +25,11 @@ import com.crm.corporate_crm.security.filter.JwtAuthFilter;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtFilter;
-    private final CustomUserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
     // Costruttore con injection del filtro JWT, UserDetailsService e PasswordEncoder
-    public SecurityConfig(JwtAuthFilter jwtFilter, CustomUserDetailsService userDetailsService, PasswordEncoder encoder) {
+    public SecurityConfig(JwtAuthFilter jwtFilter, UserDetailsService userDetailsService, PasswordEncoder encoder) {
         this.jwtFilter = jwtFilter;
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = encoder;

@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,6 @@ import com.crm.corporate_crm.anagrafica.model.Ruolo;
 import com.crm.corporate_crm.anagrafica.model.Utente;
 import com.crm.corporate_crm.anagrafica.repository.RuoloRepository;
 import com.crm.corporate_crm.anagrafica.repository.UtenteRepository;
-import com.crm.corporate_crm.anagrafica.service.CustomUserDetailsService;
 import com.crm.corporate_crm.security.dto.AuthRequest;
 import com.crm.corporate_crm.security.dto.AuthResponse;
 import com.crm.corporate_crm.security.dto.RegisterRequest;
@@ -42,7 +42,7 @@ public class AuthController {
 
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
-    private final CustomUserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
     private final UtenteRepository utenteRepository;
     private final RuoloRepository ruoloRepository;
     private final PasswordEncoder passwordEncoder;
