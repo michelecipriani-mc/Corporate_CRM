@@ -46,10 +46,8 @@ public class AuthController {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
-    private final UtenteRepository utenteRepository; // rimozione
+    // private final UtenteRepository utenteRepository; // rimozione
     private final UtenteServiceApi utenteServiceApi;
-
-    private final RuoloRepository ruoloRepository; // rimozione
 
 
     private final PasswordEncoder passwordEncoder;
@@ -66,22 +64,18 @@ public class AuthController {
         // Se le credenziali sono errate, Spring Security lancia un'eccezione 401
         // automaticamente.
         Authentication auth = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        // Recupera l'utente (UserDetails) per ottenere i ruoli e firmare correttamente
-        // il JWT.
-        // In alternativa puoi fare: UserDetails user = (UserDetails)
-        // auth.getPrincipal();
-        UserDetails user = userDetailsService.loadUserByUsername(request.getUsername());
+        // Recupera l'utente spring security (UserDetails) per ottenere i ruoli 
+        // e firmare correttamente il JWT.
+        UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
 
         // Genera il token JWT a partire dai dati dell'utente
         String accesstoken = jwtService.generateToken(user);
         String refreshToken = UUID.randomUUID().toString();
 
         // Salva il refresh token nel DB
-        Utente u = utenteRepository.findByUsername(user.getUsername()).get();
-        u.setRefreshToken(refreshToken);
-        utenteRepository.save(u);
+        utenteServiceApi.updateRefreshToken(user.getUsername(), refreshToken);
 
         // Restituisce il token al client come risposta JSON
         return ResponseEntity.ok(new AuthResponse(accesstoken, refreshToken));
@@ -91,10 +85,10 @@ public class AuthController {
     public ResponseEntity<AuthResponse> refresh(@RequestBody Map<String, String> request) {
         String refreshToken = request.get("refreshToken");
 
-        Utente u = utenteRepository.findAll().stream()
+        /*Utente u = utenteRepository.findAll().stream()
                 .filter(user -> refreshToken.equals(user.getRefreshToken()))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Refresh token non valido"));
+                .orElseThrow(() -> new RuntimeException("Refresh token non valido"));*/
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(u.getUsername());
         String newToken = jwtService.generateToken(userDetails);
@@ -106,13 +100,13 @@ public class AuthController {
     public ResponseEntity<String> logout(@RequestBody Map<String, String> request) {
         String refreshToken = request.get("refreshToken");
 
-        utenteRepository.findAll().stream()
+        /*utenteRepository.findAll().stream()
                 .filter(u -> refreshToken.equals(u.getRefreshToken()))
                 .findFirst()
                 .ifPresent(u -> {
                     u.setRefreshToken(null);
                     utenteRepository.save(u);
-                });
+                });*/
 
         return ResponseEntity.ok("Logout effettuato.");
     }

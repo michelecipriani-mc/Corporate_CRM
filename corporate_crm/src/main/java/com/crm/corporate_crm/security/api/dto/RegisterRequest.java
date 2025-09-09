@@ -14,10 +14,6 @@ import lombok.Data;
 @Builder
 public class RegisterRequest {
 
-    @NotBlank(message = "Il campo username è obbligatorio")
-    @Size(min = 3, max = 25, message = "Lo username deve avere tra 3 e 25 caratteri")
-    private String username;
-
     @NotBlank(message = "Il campo email è obbligatoria")
     @Column(unique = true, nullable = false)
     @Pattern(
