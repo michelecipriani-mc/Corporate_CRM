@@ -18,13 +18,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
+import com.crm.corporate_crm.anagrafica.api.service.UtenteServiceApi;
 import com.crm.corporate_crm.anagrafica.model.Ruolo;
 import com.crm.corporate_crm.anagrafica.model.Utente;
 import com.crm.corporate_crm.anagrafica.repository.RuoloRepository;
 import com.crm.corporate_crm.anagrafica.repository.UtenteRepository;
 import com.crm.corporate_crm.security.dto.AuthRequest;
 import com.crm.corporate_crm.security.dto.AuthResponse;
-import com.crm.corporate_crm.security.dto.RegisterRequest;
+import com.crm.corporate_crm.security.api.dto.RegisterRequest;
 import com.crm.corporate_crm.security.service.JwtService;
 
 import lombok.RequiredArgsConstructor;
@@ -43,8 +45,13 @@ public class AuthController {
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final UtenteRepository utenteRepository;
-    private final RuoloRepository ruoloRepository;
+
+    private final UtenteRepository utenteRepository; // rimozione
+    private final UtenteServiceApi utenteServiceApi;
+
+    private final RuoloRepository ruoloRepository; // rimozione
+
+
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -113,22 +120,16 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Validated @RequestBody RegisterRequest request) {
 
-        if (utenteRepository.findByUsername(request.getUsername()).isPresent()) {
+        // Controlla se l'email è già in uso
+        if (utenteServiceApi.findByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Username già registrato");
+                    .body("Utente già registrato con questa email");
         }
 
-        Ruolo ruolo = ruoloRepository.findByNome(request.getRuolo())
-        .orElseThrow(() -> new RuntimeException("Ruolo non trovato"));
+        // Salva nuovo utente
+        utenteServiceApi.save(request);
 
-        Utente utente = Utente.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .ruoli(Set.of(ruolo))
-                .build();
-
-        utenteRepository.save(utente);
-
+        // Invia conferma
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Registrazione completata con successo");
     }

@@ -15,13 +15,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UtenteRepository utenteRepository;
 
+    // Sostituzione username spring security con email
+
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Utente u = utenteRepository.findByUsername(username)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
+        Utente u = utenteRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Utente non trovato"));
 
         return User.builder()
-                .username(u.getUsername())
+                .username(u.getEmail())
                 .password(u.getPassword())
                 .roles(u.getRuoli()
                         .stream()
