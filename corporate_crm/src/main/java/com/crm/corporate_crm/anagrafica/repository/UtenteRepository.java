@@ -11,5 +11,7 @@ import com.crm.corporate_crm.anagrafica.model.Utente;
 public interface UtenteRepository extends JpaRepository<Utente, Long> {
 
     Optional<Utente> findByEmail(String email); //ricerca utente per email
+
+    Optional<Utente> findByUsername(String username); //ricerca utente per username
     
 }

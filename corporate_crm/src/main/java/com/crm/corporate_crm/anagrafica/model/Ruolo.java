@@ -25,7 +25,7 @@ public class Ruolo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //attributo ID
 
-    private String nomeRuolo; //attributo nome ruolo
+    private String nome; //attributo nome ruolo
 
     @ManyToMany
     private List<Utente> utenti;

@@ -13,11 +13,13 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "utente")
@@ -28,9 +30,7 @@ public class Utente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //attributo ID
 
-    private String nome; //attributo nome 
-
-    private String cognome; //attributo cognome 
+    private String username; //attributo composto da nome e cognome
 
     private String email; //attributo email
 

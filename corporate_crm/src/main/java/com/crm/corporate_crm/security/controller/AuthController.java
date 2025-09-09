@@ -1,6 +1,7 @@
 package com.crm.corporate_crm.security.controller;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -10,18 +11,23 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.crm.corporate_crm.anagrafica.model.Ruolo;
 import com.crm.corporate_crm.anagrafica.model.Utente;
+import com.crm.corporate_crm.anagrafica.repository.RuoloRepository;
+import com.crm.corporate_crm.anagrafica.repository.UtenteRepository;
+import com.crm.corporate_crm.anagrafica.service.CustomUserDetailsService;
 import com.crm.corporate_crm.security.dto.AuthRequest;
 import com.crm.corporate_crm.security.dto.AuthResponse;
 import com.crm.corporate_crm.security.dto.RegisterRequest;
 import com.crm.corporate_crm.security.service.JwtService;
 
-import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Controller REST per la gestione dell'autenticazione tramite JWT.
@@ -29,21 +35,17 @@ import jakarta.validation.Valid;
  * e restituire un token JWT valido.
  */
 @RestController
-@RequestMapping("/auth") // Tutti gli endpoint di questa classe iniziano con /auth
+@RequestMapping("/auth")
+@RequiredArgsConstructor
+@Validated
 public class AuthController {
 
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final UtenteRepository utenteRepository;
+    private final RuoloRepository ruoloRepository;
     private final PasswordEncoder passwordEncoder;
-
-    // Iniezione delle dipendenze tramite costruttore
-    public AuthController(AuthenticationManager authManager, JwtService jwtService,
-            CustomUserDetailsService userDetailsService) {
-        this.authManager = authManager;
-        this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
-    }
 
     /**
      * Endpoint POST /auth/login
@@ -75,7 +77,7 @@ public class AuthController {
         utenteRepository.save(u);
 
         // Restituisce il token al client come risposta JSON
-        return ResponseEntity.ok(new AuthResponse(token));
+        return ResponseEntity.ok(new AuthResponse(accesstoken, refreshToken));
     }
 
     @PostMapping("/refresh")
@@ -109,19 +111,23 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@Validated @RequestBody RegisterRequest request) {
 
         if (utenteRepository.findByUsername(request.getUsername()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Username già registrato");
         }
 
-        Utente nuovo = new Utente();
-        nuovo.setUsername(request.getUsername());
-        nuovo.setPassword(passwordEncoder.encode(request.getPassword()));
-        nuovo.setRuolo(request.getRuolo());
+        Ruolo ruolo = ruoloRepository.findByNome(request.getRuolo())
+        .orElseThrow(() -> new RuntimeException("Ruolo non trovato"));
 
-        utenteRepository.save(nuovo);
+        Utente utente = Utente.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .ruoli(Set.of(ruolo))
+                .build();
+
+        utenteRepository.save(utente);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Registrazione completata con successo");
