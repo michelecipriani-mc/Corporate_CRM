@@ -1,7 +1,6 @@
 package com.crm.corporate_crm.security.controller;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -20,10 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
 import com.crm.corporate_crm.anagrafica.api.service.UtenteServiceApi;
-import com.crm.corporate_crm.anagrafica.model.Ruolo;
-import com.crm.corporate_crm.anagrafica.model.Utente;
-import com.crm.corporate_crm.anagrafica.repository.RuoloRepository;
-import com.crm.corporate_crm.anagrafica.repository.UtenteRepository;
 import com.crm.corporate_crm.security.dto.AuthRequest;
 import com.crm.corporate_crm.security.dto.AuthResponse;
 import com.crm.corporate_crm.security.api.dto.RegisterRequest;
@@ -45,12 +40,9 @@ public class AuthController {
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-
+    private final PasswordEncoder passwordEncoder;
     // private final UtenteRepository utenteRepository; // rimozione
     private final UtenteServiceApi utenteServiceApi;
-
-
-    private final PasswordEncoder passwordEncoder;
 
     /**
      * Endpoint POST /auth/login
@@ -82,37 +74,33 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@RequestBody Map<String, String> request) {
+    public ResponseEntity<AuthResponse> refresh (@RequestBody Map<String, String> request) {
+
         String refreshToken = request.get("refreshToken");
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.get("email"));
+        UtenteDto utente = utenteServiceApi.findByEmail(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("Utente non trovato"));
+        if (utente.getRefreshToken() != null && utente.getRefreshToken().equals(refreshToken)) {
+            String newToken = jwtService.generateToken(userDetails);
+            // Salva il refresh token nel DB
+            utenteServiceApi.updateRefreshToken(utente.getEmail(), newToken);
+            return ResponseEntity.ok(new AuthResponse(newToken, refreshToken));
+        } else {
+            throw new RuntimeException("Refresh Token non valido");
+        }
 
-        /*Utente u = utenteRepository.findAll().stream()
-                .filter(user -> refreshToken.equals(user.getRefreshToken()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Refresh token non valido"));*/
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(u.getUsername());
-        String newToken = jwtService.generateToken(userDetails);
-
-        return ResponseEntity.ok(new AuthResponse(newToken, refreshToken));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refreshToken");
+    public ResponseEntity<String> logout (@RequestBody Map<String, String> request) {
 
-        /*utenteRepository.findAll().stream()
-                .filter(u -> refreshToken.equals(u.getRefreshToken()))
-                .findFirst()
-                .ifPresent(u -> {
-                    u.setRefreshToken(null);
-                    utenteRepository.save(u);
-                });*/
-
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.get("email"));
+        utenteServiceApi.updateRefreshToken(userDetails.getUsername(), null);
         return ResponseEntity.ok("Logout effettuato.");
+
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Validated @RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register (@Validated @RequestBody RegisterRequest request) {
 
         // Controlla se l'email è già in uso
         if (utenteServiceApi.findByEmail(request.getEmail()).isPresent()) {
@@ -120,6 +108,8 @@ public class AuthController {
                     .body("Utente già registrato con questa email");
         }
 
+        // Hashing password
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
         // Salva nuovo utente
         utenteServiceApi.save(request);
 

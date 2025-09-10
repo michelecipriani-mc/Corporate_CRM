@@ -3,9 +3,6 @@ package com.crm.corporate_crm.anagrafica.api.dto;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.crm.corporate_crm.anagrafica.model.Ruolo;
-import com.crm.corporate_crm.anagrafica.model.TipiRuolo;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

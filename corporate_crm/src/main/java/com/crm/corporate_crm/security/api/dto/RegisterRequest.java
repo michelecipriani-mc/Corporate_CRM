@@ -1,12 +1,8 @@
 package com.crm.corporate_crm.security.api.dto;
 
-import org.hibernate.validator.constraints.UniqueElements;
-
 import jakarta.persistence.Column;
-import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 
