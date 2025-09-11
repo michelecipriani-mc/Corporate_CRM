@@ -62,7 +62,7 @@ public class AuthService {
             String newAccessToken = jwtService.generateToken(userDetails);
             String newRefreshToken = jwtService.generateRefreshToken(userDetails);
             // Salva il refresh token nel DB
-            utenteServiceApi.updateRefreshToken(utente.getEmail(), newRefreshToken);
+            utenteServiceApi.updateRefreshToken(utente.getEmail(), newAccessToken);
             return new AuthResponse(newAccessToken, newRefreshToken);
         } else {
             throw new RuntimeException("Refresh Token non valido");
