@@ -22,6 +22,10 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long expiration;
 
+    // Recupera la durata del token (in millisecondi) dal file application.properties
+    @Value("${jwt.refreshexpiration}")
+    private long refreshExpiration;
+
     /**
      * Genera un token JWT per l'utente autenticato.
      * - Inserisce lo username come subject
@@ -37,6 +41,15 @@ public class JwtService {
             .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256) // Firma del token
             .compact(); // Compatta il tutto in una stringa JWT
     }
+
+    public String generateRefreshToken(UserDetails user) {
+        return Jwts.builder()
+            .setSubject(user.getUsername())
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration)) // es. 7 gg
+            .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
+            .compact();
+}
 
     /**
      * Estrae lo username (subject) da un token JWT.

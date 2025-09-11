@@ -1,30 +1,18 @@
 package com.crm.corporate_crm.security.controller;
 
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
-import com.crm.corporate_crm.anagrafica.api.service.UtenteServiceApi;
 import com.crm.corporate_crm.security.dto.AuthRequest;
 import com.crm.corporate_crm.security.dto.AuthResponse;
 import com.crm.corporate_crm.security.api.dto.RegisterRequest;
 import com.crm.corporate_crm.security.service.AuthService;
-import com.crm.corporate_crm.security.service.JwtService;
-
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -39,12 +27,6 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
     private final AuthService authService;
-    // private final AuthenticationManager authManager;
-    // private final JwtService jwtService;
-    // private final UserDetailsService userDetailsService;
-    // private final PasswordEncoder passwordEncoder;
-    // // private final UtenteRepository utenteRepository; // rimozione
-    // private final UtenteServiceApi utenteServiceApi;
 
     /**
      * Endpoint POST /auth/login
