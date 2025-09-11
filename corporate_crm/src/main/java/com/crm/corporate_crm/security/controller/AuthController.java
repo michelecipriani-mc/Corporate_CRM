@@ -46,8 +46,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout (@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody Map<String, String> request) {
-        return ResponseEntity.ok(authService.logout(customUserDetails, request));
+    public ResponseEntity<String> logout (@RequestBody Map<String, String> request) {
+        return ResponseEntity.ok(authService.logout(request));
     }
 
     @PostMapping("/register")

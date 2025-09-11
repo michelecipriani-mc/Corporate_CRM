@@ -77,12 +77,26 @@ public class AuthService {
         }
     }
 
-    public String logout (CustomUserDetails customUserDetails, Map<String, String> request) {
+    public String logout (Map<String, String> request) {
 
-        // UserDetails userDetails = userDetailsService.loadUserByUsername(request.get("email"));
-        utenteServiceApi.updateRefreshToken(customUserDetails.getId(), null);
+        String accessToken = request.get("accessToken");
+    
+        if (accessToken == null || accessToken.isEmpty()) {
+            throw new IllegalArgumentException("Access Token non può essere nullo o vuoto.");
+        }
+
+        String email = jwtService.extractUsername(accessToken);
+
+        UtenteDto utente = utenteServiceApi.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+        // Annullato il refresh token
+        utenteServiceApi.updateRefreshToken(utente.getId(), null);
+
+        // TODO: annullare l'access token
+
+
         return "Logout effettuato correttamente!";
-
     }
 
     public String register (RegisterRequest request) {
