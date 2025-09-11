@@ -1,18 +1,11 @@
 package com.crm.corporate_crm.anagrafica.service;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
-
 import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteInfoDto;
-import com.crm.corporate_crm.anagrafica.model.Ruolo;
 import com.crm.corporate_crm.anagrafica.model.Utente;
-import com.crm.corporate_crm.anagrafica.repository.RuoloRepository;
 import com.crm.corporate_crm.anagrafica.repository.UtenteRepository;
 import com.crm.corporate_crm.security.api.dto.RegisterRequest;
 import com.crm.corporate_crm.anagrafica.api.service.UtenteServiceApi;
@@ -27,22 +20,17 @@ public class UtenteService implements UtenteServiceApi {
 
     private final ModelMapper modelMapper;
 
-    private final PasswordEncoder passwordEncoder;
-
-    private final RuoloRepository ruoloRepository;
-
     /**
      * *Metodo di ricerca utente per id di registrazione, nel caso di utente
      * inesistente abbiamo una RuntimeException
      */
-    public Utente findById(Long id) {
+    public Optional<UtenteDto> findById(Long id) {
         return utenteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato o inesistente.."));
+            .map(utente -> modelMapper.map(utente, UtenteDto.class));
     }
 
     /** *Metodo di ricerca utente per email */
     public Optional<UtenteDto> findByEmail(String email) {
-
         return utenteRepository.findByEmail(email)
                 .map(utente -> modelMapper.map(utente, UtenteDto.class));
     }
@@ -54,10 +42,9 @@ public class UtenteService implements UtenteServiceApi {
                 UtenteDto.class);
     }
 
-    public void updateRefreshToken(String email, String refreshToken) {
-        Utente u = utenteRepository.findByEmail(email)
+    public void updateRefreshToken(Long id, String refreshToken) {
+        Utente u = utenteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Email utente non trovata per aggiornamento token"));
-
         u.setRefreshToken(refreshToken);
         utenteRepository.save(u);
     }
@@ -67,13 +54,6 @@ public class UtenteService implements UtenteServiceApi {
 
         // Converti richiesta registrazione in entità utente
         Utente utente = modelMapper.map(dto, Utente.class);
-
-        // Inserisci ruoli base
-        Set<Ruolo> ruoliIniziali = new HashSet<>();
-        ruoliIniziali.add(
-                ruoloRepository.findByNome("UTENTE")
-                        .orElseThrow(() -> new RuntimeException("Ruolo base per nuovi utenti assente.")));
-        utente.setRuoli(ruoliIniziali);
 
         // Salva nuovo utente in DB
         Utente registrato = utenteRepository.save(utente);

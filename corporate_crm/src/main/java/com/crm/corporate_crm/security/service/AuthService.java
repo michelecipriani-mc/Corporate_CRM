@@ -5,13 +5,10 @@ import java.util.Map;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
-import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
+import com.crm.corporate_crm.anagrafica.api.dto.CustomUserDetails;
 import com.crm.corporate_crm.anagrafica.api.service.UtenteServiceApi;
 import com.crm.corporate_crm.security.api.dto.RegisterRequest;
 import com.crm.corporate_crm.security.dto.AuthRequest;
@@ -25,7 +22,6 @@ public class AuthService {
 
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     // private final UtenteRepository utenteRepository; // rimozione
     private final UtenteServiceApi utenteServiceApi;
@@ -40,40 +36,39 @@ public class AuthService {
 
         // Recupera l'utente spring security (UserDetails) per ottenere i ruoli 
         // e firmare correttamente il JWT.
-        UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
+        // UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
+        CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
 
         // Genera il token JWT a partire dai dati dell'utente
         String accesstoken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
         // Salva il refresh token nel DB
-        utenteServiceApi.updateRefreshToken(user.getUsername(), refreshToken);
+        utenteServiceApi.updateRefreshToken(user.getId(), refreshToken);
 
         // Restituisce il token al client come risposta JSON
         return new AuthResponse(accesstoken, refreshToken);
     }
 
-    public AuthResponse refresh (Map<String, String> request) {
+    public AuthResponse refresh (CustomUserDetails customUserDetails, Map<String, String> request) {
 
         String refreshToken = request.get("refreshToken");
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.get("email"));
-        UtenteDto utente = utenteServiceApi.findByEmail(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("Utente non trovato"));
-        if (utente.getRefreshToken() != null && utente.getRefreshToken().equals(refreshToken)) {
-            String newAccessToken = jwtService.generateToken(userDetails);
-            String newRefreshToken = jwtService.generateRefreshToken(userDetails);
+        // UtenteDto utente = utenteServiceApi.findById(customUserDetails.getId()).orElseThrow(() -> new RuntimeException("Utente non trovato"));
+        if (customUserDetails.getRefreshToken() != null && customUserDetails.getRefreshToken().equals(refreshToken)) {
+            String newAccessToken = jwtService.generateToken(customUserDetails);
+            String newRefreshToken = jwtService.generateRefreshToken(customUserDetails);
             // Salva il refresh token nel DB
-            utenteServiceApi.updateRefreshToken(utente.getEmail(), newAccessToken);
+            utenteServiceApi.updateRefreshToken(customUserDetails.getId(), newRefreshToken);
             return new AuthResponse(newAccessToken, newRefreshToken);
         } else {
             throw new RuntimeException("Refresh Token non valido");
         }
-
     }
 
-    public String logout (Map<String, String> request) {
+    public String logout (CustomUserDetails customUserDetails, Map<String, String> request) {
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.get("email"));
-        utenteServiceApi.updateRefreshToken(userDetails.getUsername(), null);
+        // UserDetails userDetails = userDetailsService.loadUserByUsername(request.get("email"));
+        utenteServiceApi.updateRefreshToken(customUserDetails.getId(), null);
         return "Logout effettuato correttamente!";
 
     }
