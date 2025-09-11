@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.crm.corporate_crm.anagrafica.api.dto.CustomUserDetails;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -42,9 +44,9 @@ public class JwtService {
             .compact(); // Compatta il tutto in una stringa JWT
     }
 
-    public String generateRefreshToken(UserDetails user) {
+    public String generateRefreshToken(CustomUserDetails user) {
         return Jwts.builder()
-            .setSubject(user.getUsername())
+            .setSubject(user.getEmail())
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration)) // es. 7 gg
             .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)

@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.crm.corporate_crm.anagrafica.api.dto.CustomUserDetails;
+import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
 import com.crm.corporate_crm.anagrafica.api.service.UtenteServiceApi;
 import com.crm.corporate_crm.security.api.dto.RegisterRequest;
 import com.crm.corporate_crm.security.dto.AuthRequest;
@@ -50,15 +51,26 @@ public class AuthService {
         return new AuthResponse(accesstoken, refreshToken);
     }
 
-    public AuthResponse refresh (CustomUserDetails customUserDetails, Map<String, String> request) {
+    public AuthResponse refresh (Map<String, String> request) {
 
+        String accessToken = request.get("accessToken");
         String refreshToken = request.get("refreshToken");
-        // UtenteDto utente = utenteServiceApi.findById(customUserDetails.getId()).orElseThrow(() -> new RuntimeException("Utente non trovato"));
-        if (customUserDetails.getRefreshToken() != null && customUserDetails.getRefreshToken().equals(refreshToken)) {
-            String newAccessToken = jwtService.generateToken(customUserDetails);
-            String newRefreshToken = jwtService.generateRefreshToken(customUserDetails);
+
+        if (accessToken == null || accessToken.isEmpty()) {
+            throw new IllegalArgumentException("Access Token non può essere nullo o vuoto.");
+        }
+
+        String email = jwtService.extractUsername(accessToken);
+
+        UtenteDto utente = utenteServiceApi.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+        
+        if (utente.getRefreshToken() != null && utente.getRefreshToken().equals(refreshToken)) {
+            String newAccessToken = jwtService.generateToken(utente);
+            String newRefreshToken = jwtService.generateRefreshToken(utente);
             // Salva il refresh token nel DB
-            utenteServiceApi.updateRefreshToken(customUserDetails.getId(), newRefreshToken);
+            utenteServiceApi.updateRefreshToken(utente.getId(), newRefreshToken);
             return new AuthResponse(newAccessToken, newRefreshToken);
         } else {
             throw new RuntimeException("Refresh Token non valido");

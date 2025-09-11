@@ -1,6 +1,7 @@
 package com.crm.corporate_crm.anagrafica.api.dto;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,8 +28,14 @@ public class UtenteDto implements CustomUserDetails {
     private String refreshToken; // attributo per refreshare il Token
 
     @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        throw new UnsupportedOperationException("Unimplemented method 'getAuthorities'");
+        //throw new UnsupportedOperationException("Unimplemented method 'getAuthorities'");
+        return Collections.emptyList();
     }
 
 }

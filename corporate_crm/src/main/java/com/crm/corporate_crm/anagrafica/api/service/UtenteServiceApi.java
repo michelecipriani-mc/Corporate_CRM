@@ -17,7 +17,7 @@ public interface UtenteServiceApi {
   UtenteDto findByUsername(String username);
 
   /** metodo per aggiornare e salvare il refresh token */
-  void updateRefreshToken(Long Id, String refreshToken);
+  void updateRefreshToken(Long id, String refreshToken);
 
   /** Registra utente */
   UtenteInfoDto save(RegisterRequest registerUserDto);

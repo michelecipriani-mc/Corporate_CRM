@@ -41,8 +41,8 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh (@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody Map<String, String> request) {
-        return ResponseEntity.ok(authService.refresh(customUserDetails, request));
+    public ResponseEntity<AuthResponse> refresh (@RequestBody Map<String, String> request) {
+        return ResponseEntity.ok(authService.refresh(request));
     }
 
     @PostMapping("/logout")
