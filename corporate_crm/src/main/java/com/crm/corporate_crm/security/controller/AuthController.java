@@ -22,6 +22,7 @@ import com.crm.corporate_crm.anagrafica.api.service.UtenteServiceApi;
 import com.crm.corporate_crm.security.dto.AuthRequest;
 import com.crm.corporate_crm.security.dto.AuthResponse;
 import com.crm.corporate_crm.security.api.dto.RegisterRequest;
+import com.crm.corporate_crm.security.service.AuthService;
 import com.crm.corporate_crm.security.service.JwtService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,12 +38,13 @@ import lombok.RequiredArgsConstructor;
 @Validated
 public class AuthController {
 
-    private final AuthenticationManager authManager;
-    private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
-    // private final UtenteRepository utenteRepository; // rimozione
-    private final UtenteServiceApi utenteServiceApi;
+    private final AuthService authService;
+    // private final AuthenticationManager authManager;
+    // private final JwtService jwtService;
+    // private final UserDetailsService userDetailsService;
+    // private final PasswordEncoder passwordEncoder;
+    // // private final UtenteRepository utenteRepository; // rimozione
+    // private final UtenteServiceApi utenteServiceApi;
 
     /**
      * Endpoint POST /auth/login
@@ -50,71 +52,35 @@ public class AuthController {
      * autentica l'utente e restituisce un token JWT (AuthResponse).
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<AuthResponse> login (@RequestBody AuthRequest request) {
 
-        // Autentica l'utente usando AuthenticationManager.
-        // Se le credenziali sono errate, Spring Security lancia un'eccezione 401
-        // automaticamente.
-        Authentication auth = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        return ResponseEntity.ok(authService.login(request));
 
-        // Recupera l'utente spring security (UserDetails) per ottenere i ruoli 
-        // e firmare correttamente il JWT.
-        UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
-
-        // Genera il token JWT a partire dai dati dell'utente
-        String accesstoken = jwtService.generateToken(user);
-        String refreshToken = UUID.randomUUID().toString();
-
-        // Salva il refresh token nel DB
-        utenteServiceApi.updateRefreshToken(user.getUsername(), refreshToken);
-
-        // Restituisce il token al client come risposta JSON
-        return ResponseEntity.ok(new AuthResponse(accesstoken, refreshToken));
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh (@RequestBody Map<String, String> request) {
 
-        String refreshToken = request.get("refreshToken");
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.get("email"));
-        UtenteDto utente = utenteServiceApi.findByEmail(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("Utente non trovato"));
-        if (utente.getRefreshToken() != null && utente.getRefreshToken().equals(refreshToken)) {
-            String newToken = jwtService.generateToken(userDetails);
-            // Salva il refresh token nel DB
-            utenteServiceApi.updateRefreshToken(utente.getEmail(), newToken);
-            return ResponseEntity.ok(new AuthResponse(newToken, refreshToken));
-        } else {
-            throw new RuntimeException("Refresh Token non valido");
-        }
+        return ResponseEntity.ok(authService.refresh(request));
 
     }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout (@RequestBody Map<String, String> request) {
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.get("email"));
-        utenteServiceApi.updateRefreshToken(userDetails.getUsername(), null);
-        return ResponseEntity.ok("Logout effettuato.");
+        return ResponseEntity.ok(authService.logout(request));
 
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register (@Validated @RequestBody RegisterRequest request) {
 
-        // Controlla se l'email è già in uso
-        if (utenteServiceApi.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Utente già registrato con questa email");
+        try {
+            return ResponseEntity.ok(authService.register(request));
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
 
-        // Hashing password
-        request.setPassword(passwordEncoder.encode(request.getPassword()));
-        // Salva nuovo utente
-        utenteServiceApi.save(request);
-
-        // Invia conferma
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Registrazione completata con successo");
     }
 }

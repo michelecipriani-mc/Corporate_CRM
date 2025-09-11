@@ -68,9 +68,6 @@ public class UtenteService implements UtenteServiceApi {
         // Converti richiesta registrazione in entità utente
         Utente utente = modelMapper.map(dto, Utente.class);
 
-        // Hashing password
-        utente.setPassword(passwordEncoder.encode(dto.getPassword()));
-
         // Inserisci ruoli base
         Set<Ruolo> ruoliIniziali = new HashSet<>();
         ruoliIniziali.add(
