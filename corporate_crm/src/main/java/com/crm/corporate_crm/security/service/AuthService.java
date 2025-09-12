@@ -94,6 +94,7 @@ public class AuthService {
         utenteServiceApi.updateRefreshToken(utente.getId(), null);
 
         // TODO: annullare l'access token
+        
 
 
         return "Logout effettuato correttamente!";
@@ -105,6 +106,8 @@ public class AuthService {
         if (utenteServiceApi.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Utente già registrato con questa email");
         }
+
+        request.setRuolo("UTENTE");
 
         // Hashing password
         request.setPassword(passwordEncoder.encode(request.getPassword()));

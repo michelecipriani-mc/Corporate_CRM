@@ -23,7 +23,7 @@ public class RegisterRequest {
     message = "La password deve contenere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale")
     private String password;
 
-    @NotBlank(message = "Il ruolo è obbligatorio (es: USER)")
+    //@NotBlank(message = "Il ruolo è obbligatorio (es: USER)")
     private String ruolo;
 
 }
