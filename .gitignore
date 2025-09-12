@@ -19,9 +19,22 @@
 *.tar.gz
 *.rar
 
-# node_modules
-*/node_modules
-
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+
+# ------------------------------------
+# Angular Frontend
+# ------------------------------------
+
+# dipendenze di Node.js, i moduli npm.
+
+/corporate_crm_front/node_modules
+
+# output compilazione di Angular.
+/corporate_crm_front/dist/
+
+# File temporanei o di cache.
+/corporate_crm_front/tmp/
+/corporate_crm_front/.angular/cache
