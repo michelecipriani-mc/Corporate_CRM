@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.crm.corporate_crm.anagrafica.service.CustomUserDetailsService;
 import com.crm.corporate_crm.security.service.JwtService;
+import com.crm.corporate_crm.security.service.TokenRevocatoService;
+
 import java.io.IOException;
 
 /**
@@ -25,6 +27,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final TokenRevocatoService tokenRevocatoService;
 
     /**
      * Metodo eseguito automaticamente ad ogni richiesta HTTP.
@@ -46,25 +49,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // Estrae il token JWT eliminando il prefisso "Bearer"
         String token = authHeader.substring(7);
-
+        
         // Estrae lo username (subject) dal token
         String username = jwtService.extractUsername(token);
-
         // Se lo username è presente e l'utente non è già autenticato
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             // Carica l'utente dal database (o da un servizio)
             UserDetails user = userDetailsService.loadUserByUsername(username);
 
             // Verifica se il token è valido per l'utente caricato
-            if (jwtService.isTokenValid(token, user)) {
+            if (jwtService.isTokenValid(token, user) && !tokenRevocatoService.isPresentToken(token)) {
                 // Crea un oggetto di autenticazione con ruoli e dettagli dell’utente
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     user, null, user.getAuthorities()
                 );
-
                 // Aggiunge ulteriori dettagli della richiesta (IP, sessione, ecc.)
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                 // Imposta l'utente autenticato nel SecurityContext di Spring
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
