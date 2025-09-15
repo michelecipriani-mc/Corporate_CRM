@@ -95,26 +95,27 @@ public class AuthService {
 
         // TODO: annullare l'access token
         
-
-
         return "Logout effettuato correttamente!";
     }
 
-    public String register (RegisterRequest request) {
+    public AuthResponse register (RegisterRequest request) {
 
         // Controlla se l'email è già in uso
         if (utenteServiceApi.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Utente già registrato con questa email");
         }
+        
+        //Creo un nuovo oggetto AuthRequest prima di codificarlo, utile per il richiamo del metodo login
+        AuthRequest newRequest = new AuthRequest(request.getEmail(), request.getPassword());
 
+        // Assegnazione automatica del ruolo Utente
         request.setRuolo("UTENTE");
-
         // Hashing password
         request.setPassword(passwordEncoder.encode(request.getPassword()));
         // Salva nuovo utente
         utenteServiceApi.save(request);
 
-        // Invia conferma
-        return "Registrazione completata con successo";
+        // Invia conferma di registrazione effettuando direttamente il login al CRM
+        return login(newRequest);
     }
 }

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import com.crm.corporate_crm.anagrafica.api.dto.CustomUserDetails;
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
-import com.crm.corporate_crm.anagrafica.model.Ruolo;
 import com.crm.corporate_crm.anagrafica.model.Utente;
 import com.crm.corporate_crm.anagrafica.repository.UtenteRepository;
 
