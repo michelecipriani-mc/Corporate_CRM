@@ -88,5 +88,12 @@ public class JwtService {
     private boolean isExpired(String token) {
         return getClaims(token).getExpiration().before(new Date());
     }
+
+    /**
+     * Recupera la data dell'avvenuta scadenza del token.
+     */
+    public Date extractExpiration(String accessToken) {
+        return getClaims(accessToken).getExpiration();
+    }
 }
 

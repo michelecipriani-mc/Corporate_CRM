@@ -22,7 +22,7 @@ public class UtenteDto implements CustomUserDetails {
     //attibuti DTO
     private Long id; // Id Dto
     private String email; //mail Dto
-    private String username; 
+    private String username; //username Dto
     private String password; //password Dto
     private Set<TipiRuolo> ruoliId = new HashSet<>(); //lista dei ruoli associati all'utenete
     private String refreshToken; // attributo per refreshare il Token
