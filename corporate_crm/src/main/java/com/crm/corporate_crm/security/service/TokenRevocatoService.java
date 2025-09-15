@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TokenRevocatoService {
     /** DI della repository del token revocato */
-    private TokenRevocatoRepository tokenRevocatoRepository;
+    private final TokenRevocatoRepository tokenRevocatoRepository;
 
     /** Metodo per la regiostrazione del token revocato in blacklist */
     public void blackListToken (String token, Instant expiryDate) {

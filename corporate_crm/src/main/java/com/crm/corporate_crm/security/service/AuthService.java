@@ -81,6 +81,10 @@ public class AuthService {
             String newRefreshToken = jwtService.generateRefreshToken(utente);
             // Salva il refresh token nel DB
             utenteServiceApi.updateRefreshToken(utente.getId(), newRefreshToken);
+
+            // Salva l'access token vecchio in blacklist
+            tokenRevocatoService.blackListToken(accessToken, jwtService.extractExpiration(accessToken).toInstant());
+
             return new AuthResponse(newAccessToken, newRefreshToken);
         } else {
             throw new RuntimeException("Refresh Token non valido");

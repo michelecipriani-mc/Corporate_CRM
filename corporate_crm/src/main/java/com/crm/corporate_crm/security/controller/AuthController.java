@@ -50,7 +50,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register (@Validated @RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register (@Validated @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 }
