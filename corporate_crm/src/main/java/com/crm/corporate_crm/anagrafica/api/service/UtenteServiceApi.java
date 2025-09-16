@@ -2,9 +2,9 @@ package com.crm.corporate_crm.anagrafica.api.service;
 
 import java.util.Optional;
 
+import com.crm.corporate_crm.anagrafica.api.dto.RegisterRequest;
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteInfoDto;
-import com.crm.corporate_crm.security.api.dto.RegisterRequest;
 
 public interface UtenteServiceApi {
   /** Ricerca per id */

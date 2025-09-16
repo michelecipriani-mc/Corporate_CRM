@@ -1,4 +1,4 @@
-package com.crm.corporate_crm.security.api.dto;
+package com.crm.corporate_crm.anagrafica.api.dto;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;

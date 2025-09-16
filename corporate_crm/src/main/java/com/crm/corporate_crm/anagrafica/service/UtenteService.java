@@ -3,11 +3,12 @@ package com.crm.corporate_crm.anagrafica.service;
 import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import com.crm.corporate_crm.anagrafica.api.dto.RegisterRequest;
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteInfoDto;
 import com.crm.corporate_crm.anagrafica.model.Utente;
 import com.crm.corporate_crm.anagrafica.repository.UtenteRepository;
-import com.crm.corporate_crm.security.api.dto.RegisterRequest;
 import com.crm.corporate_crm.anagrafica.api.service.UtenteServiceApi;
 
 import lombok.RequiredArgsConstructor;

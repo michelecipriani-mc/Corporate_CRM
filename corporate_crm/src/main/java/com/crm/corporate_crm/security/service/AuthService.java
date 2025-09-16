@@ -7,12 +7,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.crm.corporate_crm.anagrafica.api.dto.CustomUserDetails;
-import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
+
+import com.crm.corporate_crm.anagrafica.api.dto.RegisterRequest;
 import com.crm.corporate_crm.anagrafica.api.service.UtenteServiceApi;
-import com.crm.corporate_crm.security.api.dto.RegisterRequest;
+import com.crm.corporate_crm.security.api.dto.CustomUserDetails;
 import com.crm.corporate_crm.security.dto.AuthRequest;
 import com.crm.corporate_crm.security.dto.AuthResponse;
+import com.crm.corporate_crm.security.model.CustomPrincipal;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,6 +26,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final UtenteServiceApi utenteServiceApi;
+    private final CustomUserDetailsService userDetailsService;
 
 
     public AuthResponse login (AuthRequest request) {
@@ -68,8 +71,9 @@ public class AuthService {
         String email = jwtService.extractUsername(accessToken);
 
         //faccio la ricerca dell'utente via mail, altrimenti utente non trovato
-        UtenteDto utente = utenteServiceApi.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+        //UtenteDto utente = utenteServiceApi.findByEmail(email)
+        //        .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+        CustomPrincipal utente = (CustomPrincipal) userDetailsService.loadUserByEmail(email);
 
         /** Se quindi il token di accesso e valido e il refreshToken corrisponde allora genero un newAccessToken e un newRefreshToken */
         if (utente.getRefreshToken() != null && utente.getRefreshToken().equals(refreshToken)) {
@@ -102,8 +106,9 @@ public class AuthService {
         //recupero la mail dell'utente attraverso la decodifica del token
         String email = jwtService.extractUsername(accessToken);
         //faccio la ricerca dell'utente via mail, altrimenti utente non trovato
-        UtenteDto utente = utenteServiceApi.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+        //UtenteDto utente = utenteServiceApi.findByEmail(email)
+        //        .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+        CustomPrincipal utente = (CustomPrincipal) userDetailsService.loadUserByEmail(email);
 
         //Annullo il refresh token
         utenteServiceApi.updateRefreshToken(utente.getId(), null);

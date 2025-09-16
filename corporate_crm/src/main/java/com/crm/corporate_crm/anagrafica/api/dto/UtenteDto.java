@@ -8,6 +8,7 @@ import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.crm.corporate_crm.anagrafica.model.TipiRuolo;
+import com.crm.corporate_crm.security.api.dto.CustomUserDetails;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UtenteDto implements CustomUserDetails {
+public class UtenteDto {
     //attibuti DTO
     private Long id; // Id Dto
     private String email; //mail Dto
@@ -27,12 +28,12 @@ public class UtenteDto implements CustomUserDetails {
     private Set<TipiRuolo> ruoliId = new HashSet<>(); //lista dei ruoli associati all'utenete
     private String refreshToken; // attributo per refreshare il Token
 
-    @Override
+    //@Override
     public String getUsername() {
         return this.email;
     }
 
-    @Override
+    //@Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         //throw new UnsupportedOperationException("Unimplemented method 'getAuthorities'");
         return Collections.emptyList();

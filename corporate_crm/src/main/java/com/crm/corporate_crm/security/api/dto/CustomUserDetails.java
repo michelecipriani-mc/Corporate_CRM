@@ -1,4 +1,4 @@
-package com.crm.corporate_crm.anagrafica.api.dto;
+package com.crm.corporate_crm.security.api.dto;
 
 import org.springframework.security.core.userdetails.UserDetails;
 

@@ -11,8 +11,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import com.crm.corporate_crm.anagrafica.service.CustomUserDetailsService;
+
 import com.crm.corporate_crm.security.filter.JwtAuthFilter;
+import com.crm.corporate_crm.security.service.CustomUserDetailsService;
+
 import lombok.RequiredArgsConstructor;
 
 /**
