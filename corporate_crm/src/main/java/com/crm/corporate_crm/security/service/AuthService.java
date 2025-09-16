@@ -1,6 +1,7 @@
 package com.crm.corporate_crm.security.service;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -8,11 +9,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.crm.corporate_crm.anagrafica.api.dto.RegisterRequest;
+import com.crm.corporate_crm.anagrafica.api.dto.NuovoUtenteDto;
 import com.crm.corporate_crm.anagrafica.api.service.UtenteServiceApi;
 import com.crm.corporate_crm.security.api.dto.CustomUserDetails;
 import com.crm.corporate_crm.security.dto.AuthRequest;
 import com.crm.corporate_crm.security.dto.AuthResponse;
+import com.crm.corporate_crm.security.dto.RegisterRequest;
 import com.crm.corporate_crm.security.model.CustomPrincipal;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,9 @@ public class AuthService {
     private final CustomUserDetailsService userDetailsService;
 
 
+    private final String ruoloIniziale = "UTENTE";
+
+
     public AuthResponse login (AuthRequest request) {
         // Autentica l'utente usando AuthenticationManager.
         // Se le credenziali sono errate, Spring Security lancia un'eccezione 401
@@ -43,7 +48,17 @@ public class AuthService {
 
         // Genera il token JWT a partire dai dati dell'utente
         String accesstoken = jwtService.generateToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
+
+
+
+        // ID del token refresh
+        String tid = UUID.randomUUID().toString();
+
+        // Salva id nel database
+        // refreshtokenrepository.add() ...
+
+
+        String refreshToken = jwtService.generateRefreshToken(user, tid);
 
         if(tokenRevocatoService.isPresentToken(accesstoken)){
             throw new RuntimeException("Il token di accesso generato non è valido!");
@@ -56,13 +71,9 @@ public class AuthService {
         return new AuthResponse(accesstoken, refreshToken);
     }
 
-    public AuthResponse refresh (Map<String, String> request) {
+    public AuthResponse refresh (String accessToken, String refreshToken) {
 
-        // Recupero l'accessToken registrato
-        String accessToken = request.get("accessToken");
-        // Recupero il refreshToken registrato
-        String refreshToken = request.get("refreshToken");
-        //verifico che l'accessToken non sia nullo o vuoto
+        // verifico che l'accessToken non sia nullo o vuoto
         if (accessToken == null || accessToken.isEmpty()) {
             throw new IllegalArgumentException("Access Token non può essere nullo o vuoto.");
         }
@@ -82,7 +93,9 @@ public class AuthService {
             if(tokenRevocatoService.isPresentToken(newAccessToken)){
                 throw new RuntimeException("Il token di accesso generato non è valido!");
             }
-            String newRefreshToken = jwtService.generateRefreshToken(utente);
+            // ID del token refresh
+            String tid = UUID.randomUUID().toString();
+            String newRefreshToken = jwtService.generateRefreshToken(utente, tid);
             // Salva il refresh token nel DB
             utenteServiceApi.updateRefreshToken(utente.getId(), newRefreshToken);
 
@@ -95,14 +108,8 @@ public class AuthService {
         }
     }
 
-    public String logout (Map<String, String> request) {
-        // Recupero l'accessToken registrato
-        String accessToken = request.get("accessToken");
-        //verifico che l'accessToken non sia nullo o vuoto
-        if (accessToken == null || accessToken.isEmpty()) {
-            throw new IllegalArgumentException("Access Token non può essere nullo o vuoto.");
-        }
-
+    public String logout (String refreshToken) {
+        
         //recupero la mail dell'utente attraverso la decodifica del token
         String email = jwtService.extractUsername(accessToken);
         //faccio la ricerca dell'utente via mail, altrimenti utente non trovato
@@ -119,7 +126,7 @@ public class AuthService {
         return "Logout effettuato correttamente!";
     }
 
-    public AuthResponse register (RegisterRequest request) {
+    public String register (RegisterRequest request) {
 
         // Controlla se l'email è già in uso
         if (utenteServiceApi.findByEmail(request.getEmail()).isPresent()) {
@@ -129,14 +136,21 @@ public class AuthService {
         //Creo un nuovo oggetto AuthRequest prima di codificarlo, utile per il richiamo del metodo login
         AuthRequest newRequest = new AuthRequest(request.getEmail(), request.getPassword());
 
-        // Assegnazione automatica del ruolo Utente
-        request.setRuolo("UTENTE");
-        // Hashing password
-        request.setPassword(passwordEncoder.encode(request.getPassword()));
-        // Salva nuovo utente
-        utenteServiceApi.save(request);
+        // Crea richiesta nuovo utente per anagrafica
+        NuovoUtenteDto richiestaNuovoUtente = 
+                new NuovoUtenteDto(request.getUsername(), 
+                        request.getEmail(), 
 
-        // Invia conferma di registrazione effettuando direttamente il login al CRM
-        return login(newRequest);
+                        // Hashing password
+                        passwordEncoder.encode(request.getPassword()), 
+
+                        // Assegnazione automatica del ruolo Utente
+                        ruoloIniziale);
+
+        // Salva nuovo utente
+        utenteServiceApi.save(richiestaNuovoUtente);
+
+        // Invia conferma di registrazione
+        return "Registrazione effettuata con successo";
     }
 }

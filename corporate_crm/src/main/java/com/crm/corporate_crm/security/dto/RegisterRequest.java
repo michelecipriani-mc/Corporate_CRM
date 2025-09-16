@@ -1,4 +1,4 @@
-package com.crm.corporate_crm.anagrafica.api.dto;
+package com.crm.corporate_crm.security.dto;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
@@ -9,6 +9,9 @@ import lombok.Data;
 @Data
 @Builder
 public class RegisterRequest {
+
+    @NotBlank(message = "Il campo nome completo è obbligatoria")
+    private String username;
 
     @NotBlank(message = "Il campo email è obbligatoria")
     @Column(unique = true, nullable = false)

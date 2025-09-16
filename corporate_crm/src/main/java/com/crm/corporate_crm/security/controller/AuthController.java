@@ -1,18 +1,25 @@
 package com.crm.corporate_crm.security.controller;
 
 import java.util.Map;
+
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.crm.corporate_crm.anagrafica.api.dto.RegisterRequest;
 import com.crm.corporate_crm.security.dto.AuthRequest;
 import com.crm.corporate_crm.security.dto.AuthResponse;
+import com.crm.corporate_crm.security.dto.RegisterRequest;
 import com.crm.corporate_crm.security.service.AuthService;
+import org.springframework.http.HttpHeaders;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -36,22 +43,65 @@ public class AuthController {
      * autentica l'utente e restituisce un token JWT (AuthResponse).
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login (@RequestBody AuthRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<String> login (@RequestBody AuthRequest request, HttpServletResponse response) {
+
+
+        AuthResponse tokens = authService.login(request);
+        
+        // Crea il cookie HttpOnly per il refresh token
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/auth/refresh") // Solo per l'endpoint di refresh
+                .maxAge(7 * 24 * 60 * 60) // 7 giorni
+                .build();
+
+        // Aggiunge il cookie alla risposta HTTP
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        // Restituisce l'access token nel corpo della risposta
+        return ResponseEntity.ok(tokens.getAccessToken());
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh (@RequestBody Map<String, String> request) {
-        return ResponseEntity.ok(authService.refresh(request));
+    public ResponseEntity<String> refresh (
+            @CookieValue(name = "refreshToken") String refreshToken, 
+            HttpServletRequest request, 
+            HttpServletResponse response) {
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer")) {
+            throw new IllegalArgumentException("Header Authorization mancante o non valido.");
+        }
+        
+        String accessToken = authHeader.substring(7);
+
+        // Chiama il servizio con i token estratti
+        AuthResponse tokens = authService.refresh(accessToken, refreshToken);
+        
+        // Crea un nuovo cookie HttpOnly per il nuovo refresh token
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/auth/refresh")
+                .maxAge(7 * 24 * 60 * 60) // 7 giorni
+                .build();
+
+        // Aggiunge il nuovo cookie alla risposta HTTP
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        // Restituisce il nuovo access token nel corpo della risposta
+        return ResponseEntity.ok(tokens.getAccessToken());
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout (@RequestBody Map<String, String> request) {
-        return ResponseEntity.ok(authService.logout(request));
+    public ResponseEntity<String> logout (
+            @CookieValue(name = "refreshToken") String refreshToken) {
+        return ResponseEntity.ok(authService.logout(refreshToken));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register (@Validated @RequestBody RegisterRequest request) {
+    public ResponseEntity<String> register (@Validated @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 }

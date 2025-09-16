@@ -4,7 +4,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import com.crm.corporate_crm.anagrafica.api.dto.RegisterRequest;
+import com.crm.corporate_crm.anagrafica.api.dto.NuovoUtenteDto;
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteInfoDto;
 import com.crm.corporate_crm.anagrafica.model.Utente;
@@ -51,10 +51,10 @@ public class UtenteService implements UtenteServiceApi {
     }
 
     /** *Metodo per effettuare il salvataggio dell'utente */
-    public UtenteInfoDto save(RegisterRequest dto) {
+    public UtenteInfoDto save(NuovoUtenteDto nuovoUtenteDto) {
 
         // Converti richiesta registrazione in entità utente
-        Utente utente = modelMapper.map(dto, Utente.class);
+        Utente utente = modelMapper.map(nuovoUtenteDto, Utente.class);
 
         // Salva nuovo utente in DB
         Utente registrato = utenteRepository.save(utente);

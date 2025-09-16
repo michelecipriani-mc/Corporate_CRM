@@ -2,7 +2,7 @@ package com.crm.corporate_crm.anagrafica.api.service;
 
 import java.util.Optional;
 
-import com.crm.corporate_crm.anagrafica.api.dto.RegisterRequest;
+import com.crm.corporate_crm.anagrafica.api.dto.NuovoUtenteDto;
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteInfoDto;
 
@@ -20,5 +20,5 @@ public interface UtenteServiceApi {
   void updateRefreshToken(Long id, String refreshToken);
 
   /** Registra utente */
-  UtenteInfoDto save(RegisterRequest registerUserDto);
+  UtenteInfoDto save(NuovoUtenteDto nuovoUtenteDto);
 }

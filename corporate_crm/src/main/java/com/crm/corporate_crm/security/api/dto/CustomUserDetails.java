@@ -8,4 +8,6 @@ public interface CustomUserDetails extends UserDetails{
     String getEmail();
 
     String getRefreshToken();
+
+    
 }

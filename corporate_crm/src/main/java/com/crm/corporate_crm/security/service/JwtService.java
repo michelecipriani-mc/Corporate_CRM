@@ -1,6 +1,7 @@
 package com.crm.corporate_crm.security.service;
 
 import java.util.Date;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,9 +45,10 @@ public class JwtService {
             .compact(); // Compatta il tutto in una stringa JWT
     }
 
-    public String generateRefreshToken(CustomUserDetails user) {
+    public String generateRefreshToken(CustomUserDetails user, String tid) {
         return Jwts.builder()
             .setSubject(user.getEmail())
+            .claim("tid", tid)
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration)) // es. 7 gg
             .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
