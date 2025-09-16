@@ -1,7 +1,5 @@
 package com.crm.corporate_crm.security.controller;
 
-import java.util.Map;
-
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -95,10 +93,31 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout (
-            @CookieValue(name = "refreshToken") String refreshToken) {
-        return ResponseEntity.ok(authService.logout(refreshToken));
+    public ResponseEntity<String> logout(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Header Authorization mancante o non valido.");
+        }
+        String accessToken = authHeader.substring(7);
+
+        String message = authService.logout(accessToken, refreshToken);
+
+        // invalida il cookie sul client
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/auth/refresh")
+                .maxAge(0) // elimina subito
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return ResponseEntity.ok(message);
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<String> register (@Validated @RequestBody RegisterRequest request) {

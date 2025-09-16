@@ -1,6 +1,4 @@
 package com.crm.corporate_crm.security.service;
-
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,14 +47,11 @@ public class AuthService {
         // Genera il token JWT a partire dai dati dell'utente
         String accesstoken = jwtService.generateToken(user);
 
-
-
         // ID del token refresh
         String tid = UUID.randomUUID().toString();
 
         // Salva id nel database
         // refreshtokenrepository.add() ...
-
 
         String refreshToken = jwtService.generateRefreshToken(user, tid);
 
@@ -108,21 +103,21 @@ public class AuthService {
         }
     }
 
-    public String logout (String refreshToken) {
-        
-        //recupero la mail dell'utente attraverso la decodifica del token
+    public String logout(String accessToken, String refreshToken) {
+        if (accessToken == null || accessToken.isEmpty()) {
+            throw new IllegalArgumentException("Access Token non può essere nullo o vuoto.");
+        }
+
+        // recupero email dal token di accesso
         String email = jwtService.extractUsername(accessToken);
-        //faccio la ricerca dell'utente via mail, altrimenti utente non trovato
-        //UtenteDto utente = utenteServiceApi.findByEmail(email)
-        //        .orElseThrow(() -> new RuntimeException("Utente non trovato"));
         CustomPrincipal utente = (CustomPrincipal) userDetailsService.loadUserByEmail(email);
 
-        //Annullo il refresh token
+        // annullo il refresh token
         utenteServiceApi.updateRefreshToken(utente.getId(), null);
 
-        //Annullo l'access token
-        tokenRevocatoService.blackListToken(accessToken, jwtService.extractExpiration(accessToken).toInstant());
-    
+        // metto l’access token in blacklist fino alla sua scadenza
+        tokenRevocatoService.blackListToken(accessToken,jwtService.extractExpiration(accessToken).toInstant());
+
         return "Logout effettuato correttamente!";
     }
 
@@ -132,9 +127,6 @@ public class AuthService {
         if (utenteServiceApi.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Utente già registrato con questa email");
         }
-        
-        //Creo un nuovo oggetto AuthRequest prima di codificarlo, utile per il richiamo del metodo login
-        AuthRequest newRequest = new AuthRequest(request.getEmail(), request.getPassword());
 
         // Crea richiesta nuovo utente per anagrafica
         NuovoUtenteDto richiestaNuovoUtente = 
