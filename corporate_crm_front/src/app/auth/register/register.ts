@@ -12,6 +12,7 @@ import { Auth } from '../../services/auth';
 })
 export class Register {
   user = {
+    username: '',
     email: '',
     password: ''
   };
