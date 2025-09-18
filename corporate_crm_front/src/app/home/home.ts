@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Auth } from '../services/auth';
 
 @Component({
   selector: 'app-home',
@@ -9,15 +10,15 @@ import { CommonModule } from '@angular/common';
   styleUrl: './home.css'
 })
 export class Home implements OnInit{
-  userEmail: string = '';
-  auth: any;
+  userEmail: null | string = '';
+  
 
-  constructor() { }
+  constructor(private authService: Auth) { }
 
   ngOnInit(): void {
     // Qui potresti recuperare i dati dell'utente dal localStorage
     // o da un servizio di stato per mostrare un messaggio personalizzato
     // Esempio:
-    this.userEmail = this.auth.getCurrentUserEmail();
+    this.userEmail = this.authService.getToken();
   }
 }

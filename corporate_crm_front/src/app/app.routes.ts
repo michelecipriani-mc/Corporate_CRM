@@ -5,17 +5,21 @@ import { Home } from './home/home';
 
 export const routes: Routes = [
 
+
+  // Rotte pubbliche (accessibili a tutti)
   { path: 'login', component: Login },
   { path: 'register', component: Register },
-  // Rotte protette
-  // { path: 'customers', component: CustomerListComponent },
-  // { path: '', redirectTo: '/customers', pathMatch: 'full' },
-  { path: '**', redirectTo: '/login' } // Reindirizza tutto il resto al login
 
-  { path: 'home', component: Home },
-  // Aggiungi un reindirizzamento per l'URL base
-  { path: '', redirectTo: '/', pathMatch: 'full' },
-  // Reindirizza le rotte non trovate al login, a meno che l'utente non sia autenticato
-  { path: '**', redirectTo: '/' } 
+  // Rotte protette (accessibili solo agli utenti autenticati)
+  // La home è la rotta radice e protetta
+  { path: '', component: Home/*, canActivate: [authGuard] */}, 
+  // Aggiungi qui altre rotte protette, es.
+  // { path: 'customers', component: CustomerListComponent, canActivate: [authGuard] },
+
+  // Rotta generica per le pagine non trovate (da mettere sempre per ultima)
+  // Puoi reindirizzare alla home se l'utente è loggato o al login se non lo è
+  { path: '**', redirectTo: '' }
+
+
 
 ];
