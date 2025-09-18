@@ -29,8 +29,8 @@ export class Auth {
   login(credentials: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
       tap((response: any) => {
-        if (response && response.token) {
-          localStorage.setItem(this.tokenKey, response.token);
+        if (response && response.accessToken) {
+          localStorage.setItem(this.tokenKey, response.accessToken);
           this.isAuthenticatedSubject.next(true);
         }
       })

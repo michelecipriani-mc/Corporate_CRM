@@ -1,4 +1,6 @@
 package com.crm.corporate_crm.security.service;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -121,7 +123,7 @@ public class AuthService {
         return "Logout effettuato correttamente!";
     }
 
-    public String register (RegisterRequest request) {
+    public Map<String, String> register (RegisterRequest request) {
 
         // Controlla se l'email è già in uso
         if (utenteServiceApi.findByEmail(request.getEmail()).isPresent()) {
@@ -142,7 +144,11 @@ public class AuthService {
         // Salva nuovo utente
         utenteServiceApi.save(richiestaNuovoUtente);
 
+        // Restituisce un oggetto JSON con un messaggio
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Registrazione effettuata con successo");
+
         // Invia conferma di registrazione
-        return "Registrazione effettuata con successo";
+        return response;
     }
 }

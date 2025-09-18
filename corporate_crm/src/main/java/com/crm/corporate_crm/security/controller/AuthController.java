@@ -14,6 +14,10 @@ import com.crm.corporate_crm.security.dto.AuthRequest;
 import com.crm.corporate_crm.security.dto.AuthResponse;
 import com.crm.corporate_crm.security.dto.RegisterRequest;
 import com.crm.corporate_crm.security.service.AuthService;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpHeaders;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,7 +45,7 @@ public class AuthController {
      * autentica l'utente e restituisce un token JWT (AuthResponse).
      */
     @PostMapping("/login")
-    public ResponseEntity<String> login (@RequestBody AuthRequest request, HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> login (@RequestBody AuthRequest request, HttpServletResponse response) {
 
 
         AuthResponse tokens = authService.login(request);
@@ -57,8 +61,12 @@ public class AuthController {
         // Aggiunge il cookie alla risposta HTTP
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
+        // Crea un oggetto JSON da restituire
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("accessToken", tokens.getAccessToken());
+
         // Restituisce l'access token nel corpo della risposta
-        return ResponseEntity.ok(tokens.getAccessToken());
+        return ResponseEntity.ok(responseBody);
     }
 
     @PostMapping("/refresh")
@@ -120,7 +128,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<String> register (@Validated @RequestBody RegisterRequest request) {
+    public ResponseEntity<Map<String, String>> register (@Validated @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 }
