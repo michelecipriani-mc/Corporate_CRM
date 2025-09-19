@@ -31,8 +31,6 @@ import lombok.RequiredArgsConstructor;
  */
 @RestController
 @RequestMapping("/info")
-// Permetti l'accesso da URL Angular
-@CrossOrigin(origins = "http://localhost:4200")
 @RequiredArgsConstructor
 @Validated
 public class UserInfoController {

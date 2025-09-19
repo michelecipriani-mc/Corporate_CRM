@@ -32,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/auth")
 // Permetti l'accesso da URL Angular
-@CrossOrigin(origins = "http://localhost:4200") 
 @RequiredArgsConstructor
 @Validated
 public class AuthController {
