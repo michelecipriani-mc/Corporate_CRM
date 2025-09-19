@@ -70,4 +70,9 @@ public class UtenteService implements UtenteServiceApi {
         utenteRepository.deleteById(id);
     }
 
+    public Optional<UtenteInfoDto> getInfo(Long id) {
+        return utenteRepository.findById(id)
+                .map(utente -> modelMapper.map(utente, UtenteInfoDto.class));
+    }
+
 }

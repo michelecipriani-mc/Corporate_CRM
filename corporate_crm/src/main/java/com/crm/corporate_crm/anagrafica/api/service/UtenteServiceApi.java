@@ -21,4 +21,7 @@ public interface UtenteServiceApi {
 
   /** Registra utente */
   UtenteInfoDto save(NuovoUtenteDto nuovoUtenteDto);
+
+  /** Ottieni informazioni */
+  Optional<UtenteInfoDto> getInfo(Long id);
 }
