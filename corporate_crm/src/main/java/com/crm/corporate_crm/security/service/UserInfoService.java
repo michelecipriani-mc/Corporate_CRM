@@ -2,11 +2,13 @@ package com.crm.corporate_crm.security.service;
 
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteInfoDto;
 import com.crm.corporate_crm.anagrafica.api.service.UtenteServiceApi;
 import com.crm.corporate_crm.security.api.dto.CustomUserDetails;
+import com.crm.corporate_crm.security.dto.InfoRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class UserInfoService {
 
   private final UtenteServiceApi utenteServiceApi;
+  private final ModelMapper modelMapper;
 
 
 
@@ -39,5 +42,13 @@ public class UserInfoService {
   public Optional<UtenteInfoDto> getPersonalInfo(CustomUserDetails principal) {
     
     return utenteServiceApi.getInfo(principal.getId());
+
   }
+
+  public void setInfoAggiuntive(CustomUserDetails principal, InfoRequest infoRequest) {
+
+    utenteServiceApi.update(principal.getId(), modelMapper.map(infoRequest, UtenteInfoDto.class));
+
+  }
+
 }

@@ -32,6 +32,20 @@ public class Utente {
 
     private String username; //attributo composto da nome e cognome
 
+    private String cellulare; //attributo numero di telefono
+
+    private String codiceFiscale; //attributo codice fiscale
+
+    private String indirizzo; //attributo indirizzo di residenza
+
+    private String città; //attributo città di residenza
+
+    private String provincia; //attributo provincia di residenza
+
+    private String cap; //attributo cap
+
+    private String iban; //attributo iban
+
     private String email; //attributo email
 
     private String password; //attributo password 

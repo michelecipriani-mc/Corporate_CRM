@@ -1,7 +1,10 @@
 package com.crm.corporate_crm.anagrafica.service;
 
 import java.util.Optional;
+
+import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Service;
 
 import com.crm.corporate_crm.anagrafica.api.dto.NuovoUtenteDto;
@@ -27,7 +30,7 @@ public class UtenteService implements UtenteServiceApi {
      */
     public Optional<UtenteDto> findById(Long id) {
         return utenteRepository.findById(id)
-            .map(utente -> modelMapper.map(utente, UtenteDto.class));
+                .map(utente -> modelMapper.map(utente, UtenteDto.class));
     }
 
     /** *Metodo di ricerca utente per email */
@@ -73,6 +76,26 @@ public class UtenteService implements UtenteServiceApi {
     public Optional<UtenteInfoDto> getInfo(Long id) {
         return utenteRepository.findById(id)
                 .map(utente -> modelMapper.map(utente, UtenteInfoDto.class));
+    }
+
+    public UtenteInfoDto update(Long id, UtenteInfoDto utenteInfoDto) {
+        // 1. Recupera l'utente esistente
+        Utente utenteEsistente = utenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+        // 2. ModelMapper con TypeMap locale per aggiornare solo campi non nulli
+        ModelMapper modelMapper = new ModelMapper();
+        TypeMap<UtenteInfoDto, Utente> typeMap = modelMapper.createTypeMap(UtenteInfoDto.class, Utente.class);
+        typeMap.addMappings(mapper -> mapper.when(Conditions.isNotNull()));
+
+        // 3. Mappa il DTO sull'entità esistente
+        typeMap.map(utenteInfoDto, utenteEsistente);
+
+        // 4. Salva l'entità aggiornata
+        Utente aggiornato = utenteRepository.save(utenteEsistente);
+
+        // 5. Restituisci un DTO per la response
+        return modelMapper.map(aggiornato, UtenteInfoDto.class);
     }
 
 }

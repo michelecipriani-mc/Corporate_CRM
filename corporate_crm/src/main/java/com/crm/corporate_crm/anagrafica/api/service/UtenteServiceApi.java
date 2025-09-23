@@ -24,4 +24,7 @@ public interface UtenteServiceApi {
 
   /** Ottieni informazioni */
   Optional<UtenteInfoDto> getInfo(Long id);
+
+  UtenteInfoDto update(Long id, UtenteInfoDto utenteInfoDto);
+
 }

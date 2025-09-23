@@ -37,6 +37,7 @@ public class JwtService {
     public String generateToken(UserDetails user) {
         return Jwts.builder()
             .setSubject(user.getUsername()) // Username come subject
+            .claim("id", ((CustomUserDetails) user).getId())
             .claim("roles", user.getAuthorities()) // Ruoli dell’utente come claim personalizzato
             .setIssuedAt(new Date()) // Data di emissione
             .setExpiration(new Date(System.currentTimeMillis() + expiration)) // Data di scadenza
@@ -95,6 +96,10 @@ public class JwtService {
      */
     public Date extractExpiration(String accessToken) {
         return getClaims(accessToken).getExpiration();
+    }
+
+    public String extractId(String accessToken) {
+        return getClaims(accessToken).getId();
     }
 }
 
