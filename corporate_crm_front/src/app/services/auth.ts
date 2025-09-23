@@ -10,7 +10,9 @@ export class Auth {
   private apiUrl = `${environment.apiUrl}/auth`;
   private tokenKey = 'auth_token';
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
+  private refreshTokenKey = 'refresh_token';
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+
 
   constructor(private http: HttpClient) {}
 
@@ -36,9 +38,14 @@ export class Auth {
     );
   }
 
+  //Metodo verifica richiesta Login
+  isLoginRequest(request: HttpRequest<any>): boolean {
+    return request.url.includes(`${this.apiUrl}/login`);
+  }
+
   // Refresh
   refreshToken(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/refresh`, {}, { withCredentials: true }).pipe(
+    return this.http.post(`${this.apiUrl}/refresh`, {}, { withCredentials: true }).pipe(
       tap((response: any) => {
         if (response && response.accessToken) {
           this.setToken(response.accessToken);
