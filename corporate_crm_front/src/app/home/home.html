@@ -1,9 +1,45 @@
-<div *ngIf="userData">
-  <p><strong>ID:</strong> {{ userData.id }}</p>
-  <p><strong>Username:</strong> {{ userData.username }}</p>
-  <p><strong>Email:</strong> {{ userData.email }}</p>
-
-  <p><strong>Ruoli:</strong> {{ userData.ruoli.join(', ') || 'Nessuno' }}</p>
-  <p><strong>Commesse:</strong> {{ userData.commesse_id.join(', ') || 'Nessuna' }}</p>
-  <p><strong>Documenti:</strong> {{ userData.documenti_id.join(', ') || 'Nessuno' }}</p>
-</div>
+<!-- Form Anagrafica -->
+<section class="container" *ngIf="userData">
+  <header>Anagrafica utente</header>
+  <form class="form" action="#">
+    <div class="column">
+      <div class="input-box">
+        <label>Username:</label>
+        <input placeholder="{{userData.username}}" type="text" disabled>
+      </div>
+      <div class="input-box">
+        <label>Email:</label>
+        <input placeholder="{{userData.email}}" type="text" disabled>
+      </div>
+    </div>
+    <div class="column">
+      <div class="input-box">
+        <label>Cellulare:</label>
+        <input required="" placeholder="{{ userData.cellulare || 'Non inserito' }}" type="telephone" disabled>
+      </div>
+      <div class="input-box">
+        <label>Data di Nascita:</label>
+        <input required="" placeholder="{{ userData.dataNascita || 'GG/MM/AAAA' }}" type="date" disabled>
+      </div>
+    </div>
+    <div class="column">
+      <div class="input-box address">
+        <label>Indirizzo:</label>
+        <input required="" placeholder="{{ userData.indirizzo || 'Nessun Indirizzo' }}" type="text" disabled>
+      </div>
+      <input required="" placeholder="{{ userData.città || 'Nessuna Città' }}" type="text" disabled>
+    </div>
+    <div class="column">
+      <input required="" placeholder="{{ userData.provincia || 'Provincia non inserita' }}" type="text" disabled>
+      <input required="" placeholder="{{ userData.cap || 'CAP non inserito' }}" type="text" disabled>
+    </div>
+    <div class="input-box">
+      <label>Codice Fiscale:</label>
+      <input required="" placeholder="{{ userData.codiceFiscale || 'Non inserito' }}" type="text" disabled>
+    </div>
+    <p><strong>Ruoli:</strong> {{ userData.ruoli.join(', ') || 'Nessuno' }}</p>
+    <p><strong>Commesse:</strong> {{ userData.commesse_id.join(', ') || 'Nessuna' }}</p>
+    <p><strong>Documenti:</strong> {{ userData.documenti_id.join(', ') || 'Nessuno' }}</p>
+    <button>Modifica</button>
+  </form>
+</section>
