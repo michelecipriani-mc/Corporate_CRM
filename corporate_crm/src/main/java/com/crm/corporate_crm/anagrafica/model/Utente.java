@@ -32,6 +32,8 @@ public class Utente {
 
     private String username; //attributo composto da nome e cognome
 
+    private Data dataNascita;
+
     private String cellulare; //attributo numero di telefono
 
     private String codiceFiscale; //attributo codice fiscale
