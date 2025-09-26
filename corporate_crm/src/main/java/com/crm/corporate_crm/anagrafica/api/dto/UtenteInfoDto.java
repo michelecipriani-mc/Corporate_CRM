@@ -1,5 +1,6 @@
 package com.crm.corporate_crm.anagrafica.api.dto;
 
+import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,12 +18,12 @@ public class UtenteInfoDto {
     //attibuti DTO
     private Long id; // Id Dto
     private String username; //username composto da nome e cognome
-    private Data dataNascita;
+    private Date dataNascita;
     private String email; //mail Dto
     private String cellulare; //Dto numero di telefono
     private String codiceFiscale; //Dto codice fiscale
     private String indirizzo; //Dto indirizzo di residenza
-    private String città; //Dto città di residenza
+    private String citta; //Dto città di residenza
     private String provincia; //Dto provincia di residenza
     private String cap; //Dto cap
     private String iban; //Dto iban

@@ -1,5 +1,6 @@
 package com.crm.corporate_crm.anagrafica.model;
 
+import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +33,7 @@ public class Utente {
 
     private String username; //attributo composto da nome e cognome
 
-    private Data dataNascita;
+    private Date dataNascita;
 
     private String cellulare; //attributo numero di telefono
 
@@ -40,7 +41,7 @@ public class Utente {
 
     private String indirizzo; //attributo indirizzo di residenza
 
-    private String città; //attributo città di residenza
+    private String citta; //attributo città di residenza
 
     private String provincia; //attributo provincia di residenza
 
