@@ -1,10 +1,10 @@
-package com.crm.corporate_crm.anagrafica.repository;
+package com.crm.corporate_crm.security.repository;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.crm.corporate_crm.anagrafica.model.Ruolo;
+import com.crm.corporate_crm.security.model.Ruolo;
 
 public interface RuoloRepository extends JpaRepository<Ruolo, Long> {
 

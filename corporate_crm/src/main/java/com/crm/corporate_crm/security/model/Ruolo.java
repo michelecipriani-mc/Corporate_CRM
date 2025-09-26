@@ -1,4 +1,4 @@
-package com.crm.corporate_crm.anagrafica.model;
+package com.crm.corporate_crm.security.model;
 
 import java.util.List;
 import java.util.Set;
@@ -8,7 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,14 +22,13 @@ public class Ruolo {
     //lista attributi
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; //attributo ID
+    private Long id; // ID
 
-    private String nome; //attributo nome ruolo
+    private String nome; // nome ruolo
 
-    @ManyToMany
-    private List<Utente> utenti;
+    private List<Long> utenti;
 
     @ElementCollection
-    private Set<Long> richiestaCariera_id; //lista delle richieste di cariera legate al ruolo
+    private Set<Long> richiestaCarrieraId; //lista delle richieste di cariera legate al ruolo
 
 }

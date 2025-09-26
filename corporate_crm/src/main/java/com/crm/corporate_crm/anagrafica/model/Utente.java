@@ -38,7 +38,7 @@ public class Utente {
 
     private String indirizzo; //attributo indirizzo di residenza
 
-    private String città; //attributo città di residenza
+    private String citta; //attributo città di residenza
 
     private String provincia; //attributo provincia di residenza
 
@@ -52,12 +52,7 @@ public class Utente {
 
     private String refreshToken; //attributo per refreshare il Token
 
-    @ManyToMany //vincolo Molti a Molti con l'entità ruoli
-    //Riferimenti per la creazione della tabella N-M
-    @JoinTable(name = "utenti_ruoli",
-        joinColumns = {@JoinColumn(name = "UTENTE_ID", referencedColumnName = "ID")},
-        inverseJoinColumns = {@JoinColumn(name = "RUOLO_ID", referencedColumnName = "ID")})
-    private Set<Ruolo> ruoli = new HashSet<>(); //lista dei ruoli associati all'utente
+    private Set<Long> ruoli = new HashSet<>(); //lista dei ruoli associati all'utente
 
     @ElementCollection
     private Set<Long> annunci_id; //lista degli annunci a cui l'utente si è candidato

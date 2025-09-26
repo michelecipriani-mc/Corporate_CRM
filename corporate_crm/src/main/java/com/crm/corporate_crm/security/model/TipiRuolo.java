@@ -1,4 +1,4 @@
-package com.crm.corporate_crm.anagrafica.model;
+package com.crm.corporate_crm.security.model;
 
 public enum TipiRuolo {
     //tipologie di ruoli applicabili all'interno del CRM

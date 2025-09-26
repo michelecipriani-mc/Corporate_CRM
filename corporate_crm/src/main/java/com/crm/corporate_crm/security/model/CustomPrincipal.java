@@ -7,8 +7,9 @@ import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 
-import com.crm.corporate_crm.anagrafica.model.TipiRuolo;
 import com.crm.corporate_crm.security.api.dto.CustomUserDetails;
+
+import com.crm.corporate_crm.security.model.TipiRuolo;
 
 import lombok.Data;
 
