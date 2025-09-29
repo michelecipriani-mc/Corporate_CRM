@@ -45,9 +45,9 @@ public class UserInfoService {
 
   }
 
-  public void setInfoAggiuntive(CustomUserDetails principal, InfoRequest infoRequest) {
+  public UtenteInfoDto setInfoAggiuntive(CustomUserDetails principal, InfoRequest infoRequest) {
 
-    utenteServiceApi.update(principal.getId(), modelMapper.map(infoRequest, UtenteInfoDto.class));
+    return utenteServiceApi.update(principal.getId(), modelMapper.map(infoRequest, UtenteInfoDto.class));
 
   }
 

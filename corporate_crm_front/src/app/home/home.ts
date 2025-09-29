@@ -1,21 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+// import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { Auth } from '../services/auth';
 import { environment } from '../../environments/environment';
+import { HomeModal } from "../home-modal/home-modal";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HomeModal],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements OnInit {
-  private apiUrl = `${environment.apiUrl}/auth`;
+  private apiUrl = `${environment.apiUrl}/info`;
   userEmail: null | string = '';
   userData: any;
+  showWidget = false;
+  campiMancanti: string[] = [];
 
   constructor(private authService: Auth, private http: HttpClient) {}
 
@@ -28,11 +31,50 @@ export class Home implements OnInit {
     this.authService.getUserInfo().subscribe({
       next: (data) => {
         this.userData = data;
+        this.controllaCampiMancanti(data);
       },
       error: (err) => {
         console.error('Errore nel recupero dei dati utente', err);
       },
     });
-
   }
+
+  controllaCampiMancanti(user: any) {
+    const mancanti = Object.entries(user)
+      .filter(([_, value]) => value === null || value === '' || value === undefined)
+      .map(([key]) => key);
+
+    this.campiMancanti = mancanti;
+    this.showWidget = mancanti.length > 0;
+  }
+
+  onDatiNonCompilati(campi: string[]) {
+    this.campiMancanti = campi;
+    this.showWidget = campi.length > 0;
+  }
+
+    onDatiCompilati(dati: any) {
+    console.log("Dati compilati dal form:", dati);
+
+    // aggiorna localmente
+    this.userData = { ...this.userData, ...dati };
+
+    // richiama check per nascondere la modale se completato
+    this.controllaCampiMancanti(this.userData);
+
+    // opzionale: invio al backend
+    this.http.put(`${this.apiUrl}/edit`, this.userData).subscribe({
+      next: (res) => console.log("Utente aggiornato", res),
+      error: (err) => console.error("Errore aggiornamento utente", err),
+    });
+  }
+
+  apriWidget() {
+    this.showWidget = true;
+  }
+
+  onChiudiWidget() {
+    this.showWidget = false;
+  }
+
 }
