@@ -4,10 +4,11 @@ import { Navbar } from "./navbar/navbar";
 import { Footer } from "./footer/footer";
 import { Sidebar } from './sidebar/sidebar';
 import { filter } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, Footer, Sidebar],
+  imports: [RouterOutlet, Navbar, Footer, Sidebar, CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

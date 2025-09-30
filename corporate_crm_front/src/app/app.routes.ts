@@ -13,9 +13,9 @@ export const routes: Routes = [
   { path: 'register', component: Register },
 
   //route iniziale
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  //{ path: '', redirectTo: 'login', pathMatch: 'full' },
   //route iniziale se l’utente inserisce un URL sbagliato
-  { path: '**', redirectTo: 'login' },
+  //{ path: '**', redirectTo: 'login' },
 
   //Rotte da rivedere con Authgard
   // { path: 'navbar', component: Navbar },
