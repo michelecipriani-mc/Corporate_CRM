@@ -16,19 +16,17 @@ export const routes: Routes = [
   //route iniziale se l’utente inserisce un URL sbagliato
   //{ path: '**', redirectTo: 'login' },
 
-  //Rotte da rivedere con Authgard
+  //Rotte da rivedere
   // { path: 'navbar', component: Navbar },
   // { path: 'footer', component: Footer },
-  { path: 'home', component: Home, canActivate: [authGuard] },
-  //{ path: '', canActivate: [authGuard] }
 
   // Rotte protette (accessibili solo agli utenti autenticati)
-  // La home è la rotta radice e protetta
-  /*{ path: '', component: Home, canActivate: [authGuard] }*/
-  // Aggiungi qui altre rotte protette, es.
+  { path: 'home', component: Home, canActivate: [authGuard] },
+
+  // esempio:
   // { path: 'customers', component: CustomerListComponent, canActivate: [authGuard] },
 
-  // Rotta generica per le pagine non trovate (da mettere sempre per ultima)
-  // Puoi reindirizzare alla home se l'utente è loggato o al login se non lo è
-  //{ path: '**', redirectTo: '' }
+  // Rotta wildcard per le pagine non trovate (da mettere sempre per ultima)
+  // Reindirizza alla home se l'utente è loggato o al login altrimenti
+  { path: '**', pathMatch: 'full', redirectTo: 'home' },
 ];
