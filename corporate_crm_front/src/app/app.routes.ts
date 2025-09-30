@@ -2,12 +2,11 @@ import { Routes } from '@angular/router';
 import { Login } from './auth/login/login';
 import { Register } from './auth/register/register';
 import { Home } from './home/home';
+import { authGuard } from './auth-guard';
 // import { Navbar } from "./navbar/navbar";
 // import { Footer } from "./footer/footer";
 
 export const routes: Routes = [
-
-
   // Rotte pubbliche (accessibili a tutti)
   { path: 'login', component: Login },
   { path: 'register', component: Register },
@@ -20,14 +19,12 @@ export const routes: Routes = [
   //Rotte da rivedere con Authgard
   // { path: 'navbar', component: Navbar },
   // { path: 'footer', component: Footer },
-  { path: 'home', component: Home }
-
-  
-
+  { path: 'home', component: Home, canActivate: [authGuard] },
+  //{ path: '', canActivate: [authGuard] }
 
   // Rotte protette (accessibili solo agli utenti autenticati)
   // La home è la rotta radice e protetta
-  /*{ path: '', component: Home, canActivate: [authGuard] }*/, 
+  /*{ path: '', component: Home, canActivate: [authGuard] }*/
   // Aggiungi qui altre rotte protette, es.
   // { path: 'customers', component: CustomerListComponent, canActivate: [authGuard] },
 

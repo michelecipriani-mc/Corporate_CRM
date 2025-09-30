@@ -17,7 +17,7 @@ export class Auth {
   constructor(private http: HttpClient) {}
 
   // Metodo per verificare se l'utente è già autenticato
-  private hasToken(): boolean {
+  hasToken(): boolean {
     return !!localStorage.getItem(this.tokenKey);
   }
 
