@@ -7,18 +7,22 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class Auth {
-  private apiUrl = `${environment.apiUrl}/auth`;
-  private tokenKey = 'auth_token';
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
-  private refreshTokenKey = 'refresh_token';
-  public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  // URL per le chiamate API di autenticazione
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
 
+  // Stringa chiave per il valore accessToken in salvataggio locale
+  private readonly tokenKey = 'auth_token';
+
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
+  
+  public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
   // Metodo per verificare se l'utente è già autenticato
-  private hasToken(): boolean {
-    return !!localStorage.getItem(this.tokenKey);
+  hasToken(): boolean {
+    const token = localStorage.getItem(this.tokenKey);
+    return token !== null && token !== '';
   }
 
   // Metodo per la registrazione

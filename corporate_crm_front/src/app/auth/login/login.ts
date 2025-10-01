@@ -24,7 +24,7 @@ export class Login {
       next: () => {
         console.log('Login completato');
         // Reindirizza alla pagina principale dopo il login
-        this.router.navigate(['/']); 
+        this.router.navigate(['/home']); 
       },
       error: (error) => {
         console.error('Errore durante il login', error);

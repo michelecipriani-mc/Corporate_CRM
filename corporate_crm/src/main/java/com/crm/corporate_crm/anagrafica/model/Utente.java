@@ -1,5 +1,6 @@
 package com.crm.corporate_crm.anagrafica.model;
 
+import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,6 +32,8 @@ public class Utente {
     private Long id; //attributo ID
 
     private String username; //attributo composto da nome e cognome
+
+    private Date dataNascita;
 
     private String cellulare; //attributo numero di telefono
 

@@ -1,0 +1,35 @@
+<div class="sidebar" 
+     [ngClass]="{ 'expanded': isExpanded }" 
+     (mouseenter)="onMouseEnter()" 
+     (mouseleave)="onMouseLeave()">
+
+
+    <div class="sidebar-header">
+        <a href="#" class="logo-link">
+            <span class="icon">🚀</span> 
+            <span class="text" [style.opacity]="isExpanded ? 1 : 0">CRM Logo</span>
+        </a>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="#" class="nav-item active">
+            <span class="icon">🏠</span> 
+            <span class="text" [style.opacity]="isExpanded ? 1 : 0">Dashboard</span>
+        </a>
+        
+        <a href="#" class="nav-item">
+            <span class="icon">📈</span> 
+            <span class="text" [style.opacity]="isExpanded ? 1 : 0">Opportunità</span>
+        </a>
+
+        <a href="#" class="nav-item">
+            <span class="icon">👥</span> 
+            <span class="text" [style.opacity]="isExpanded ? 1 : 0">Contatti</span>
+        </a>
+
+        <a href="#" class="nav-item settings">
+            <span class="icon">⚙️</span> 
+            <span class="text" [style.opacity]="isExpanded ? 1 : 0">Impostazioni</span>
+        </a>
+    </nav>
+</div>
