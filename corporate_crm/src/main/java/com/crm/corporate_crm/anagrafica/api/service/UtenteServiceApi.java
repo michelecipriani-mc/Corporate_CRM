@@ -20,7 +20,7 @@ public interface UtenteServiceApi {
   void updateRefreshToken(Long id, String refreshToken);
 
   /** Registra utente */
-  UtenteInfoDto save(NuovoUtenteDto nuovoUtenteDto);
+  //UtenteInfoDto save(NuovoUtenteDto nuovoUtenteDto);
 
   /** Ottieni informazioni */
   Optional<UtenteInfoDto> getInfo(Long id);

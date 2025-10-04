@@ -5,13 +5,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.crm.corporate_crm.security.api.dto.CustomUserDetails;
 import com.crm.corporate_crm.security.service.CustomUserDetailsService;
 import com.crm.corporate_crm.security.service.JwtService;
 import com.crm.corporate_crm.security.service.TokenRevocatoService;
@@ -36,36 +38,50 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * Se sì, autentica l'utente associato e imposta il contesto di sicurezza.
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request, 
+            @NonNull HttpServletResponse response, 
+            @NonNull FilterChain filterChain)
         throws ServletException, IOException {
 
         // Estrae l'header Authorization dalla richiesta
         String authHeader = request.getHeader("Authorization");
 
         // Se l'header è nullo o non inizia con "Bearer ", salta il filtro e prosegue
-        if (authHeader == null || !authHeader.startsWith("Bearer")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Estrae il token JWT eliminando il prefisso "Bearer"
-        String token = authHeader.substring(7);
-        
-        // Estrae lo username (subject) dal token
-        String username = jwtService.extractUsername(token);
-        // Se lo username è presente e l'utente non è già autenticato
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Carica l'utente dal database (o da un servizio)
-            UserDetails user = userDetailsService.loadUserByUsername(username);
+        // Estrae il token JWT eliminando il prefisso "Bearer "
+        String token = authHeader.substring(7).trim();
 
-            // Verifica se il token è valido per l'utente caricato
-            if (jwtService.isTokenValid(token, user) && !tokenRevocatoService.isPresentToken(token)) {
+        // Header vuoto
+        if (token.isEmpty()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
+        // Estrae l'ID dal token
+        Long id = Long.valueOf(jwtService.extractId(token));
+
+        // Se l'ID è presente e l'utente non è già autenticato
+        if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+            // Carica l'utente dal database (o da un servizio)
+            CustomUserDetails user = userDetailsService.loadUserById(id);
+
+            // Verifica se il token è valido per l'utente caricato, e se non è in blacklist
+            if (jwtService.isTokenValid(token, user) && !tokenRevocatoService.isTokenPresent(token)) {
+
                 // Crea un oggetto di autenticazione con ruoli e dettagli dell’utente
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     user, null, user.getAuthorities()
                 );
+
                 // Aggiunge ulteriori dettagli della richiesta (IP, sessione, ecc.)
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
                 // Imposta l'utente autenticato nel SecurityContext di Spring
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }

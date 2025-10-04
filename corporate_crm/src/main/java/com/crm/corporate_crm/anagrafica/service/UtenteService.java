@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import com.crm.corporate_crm.anagrafica.api.dto.NuovoUtenteDto;
@@ -12,6 +13,7 @@ import com.crm.corporate_crm.anagrafica.api.dto.UtenteDto;
 import com.crm.corporate_crm.anagrafica.api.dto.UtenteInfoDto;
 import com.crm.corporate_crm.anagrafica.model.Utente;
 import com.crm.corporate_crm.anagrafica.repository.UtenteRepository;
+import com.crm.corporate_crm.common.events.UtenteRegistrato;
 import com.crm.corporate_crm.anagrafica.api.service.UtenteServiceApi;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,8 @@ public class UtenteService implements UtenteServiceApi {
     private final UtenteRepository utenteRepository;
 
     private final ModelMapper modelMapper;
+
+    private final ApplicationEventPublisher events;
 
     /**
      * *Metodo di ricerca utente per id di registrazione, nel caso di utente
@@ -54,16 +58,16 @@ public class UtenteService implements UtenteServiceApi {
     }
 
     /** *Metodo per effettuare il salvataggio dell'utente */
-    public UtenteInfoDto save(NuovoUtenteDto nuovoUtenteDto) {
+    public void save(UtenteRegistrato utenteRegistrato) {
 
         // Converti richiesta registrazione in entità utente
-        Utente utente = modelMapper.map(nuovoUtenteDto, Utente.class);
+        Utente nuovoUtente = modelMapper.map(utenteRegistrato, Utente.class);
 
         // Salva nuovo utente in DB
-        Utente registrato = utenteRepository.save(utente);
+        Utente nuovoUtenteRubrica = utenteRepository.save(nuovoUtente);
 
-        // Restituisci un UtenteInfoDTO per la response entity di conferma
-        return modelMapper.map(registrato, UtenteInfoDto.class);
+        // Genera evento per indice ricerca
+        //events.publishEvent(.......);
     }
 
     /**

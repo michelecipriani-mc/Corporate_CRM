@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.crm.corporate_crm.security.api.dto.CustomUserDetails;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -16,15 +17,18 @@ import io.jsonwebtoken.security.Keys;
 @Service // Indica che questa classe è un componente di servizio gestito da Spring
 public class JwtService {
 
-    // Recupera la chiave segreta per firmare/verificare i token JWT dal file application.properties
+    // Recupera la chiave segreta per firmare/verificare i token JWT dal file
+    // application.properties
     @Value("${jwt.secret}")
     private String secret;
 
-    // Recupera la durata del token (in millisecondi) dal file application.properties
+    // Recupera la durata del token (in millisecondi) dal file
+    // application.properties
     @Value("${jwt.expiration}")
     private long expiration;
 
-    // Recupera la durata del token (in millisecondi) dal file application.properties
+    // Recupera la durata del token (in millisecondi) dal file
+    // application.properties
     @Value("${jwt.refreshexpiration}")
     private long refreshExpiration;
 
@@ -34,26 +38,34 @@ public class JwtService {
      * - Inserisce i ruoli come claim
      * - Firma il token con algoritmo HS256 usando la chiave segreta
      */
-    public String generateToken(UserDetails user) {
+    public String generateToken(CustomUserDetails user) {
         return Jwts.builder()
-            .setSubject(user.getUsername()) // Username come subject
-            .claim("id", ((CustomUserDetails) user).getId())
-            .claim("roles", user.getAuthorities()) // Ruoli dell’utente come claim personalizzato
-            .setIssuedAt(new Date()) // Data di emissione
-            .setExpiration(new Date(System.currentTimeMillis() + expiration)) // Data di scadenza
-            .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256) // Firma del token
-            .compact(); // Compatta il tutto in una stringa JWT
+                .setSubject(user.getUsername()) // Username come subject
+                .claim("id", String.valueOf(user.getId()))
+                .claim("roles", user.getAuthorities()) // Ruoli dell’utente come claim personalizzato
+                .setIssuedAt(new Date()) // Data di emissione
+                .setExpiration(new Date(System.currentTimeMillis() + expiration)) // Data di scadenza
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256) // Firma del token
+                .compact(); // Compatta il tutto in una stringa JWT
     }
 
     public String generateRefreshToken(CustomUserDetails user, String tid) {
         return Jwts.builder()
-            .setSubject(user.getEmail())
-            .claim("tid", tid)
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration)) // es. 7 gg
-            .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
-            .compact();
-}
+                .setSubject(user.getEmail())
+                .claim("id", user.getId())
+                .claim("tid", tid)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration)) // es. 7 gg
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    /**
+     * Estrae l'ID del refresh token (tid).
+     */
+    public String extractTid(String refreshToken) {
+        return (String) getClaims(refreshToken).get("tid");
+    }
 
     /**
      * Estrae lo username (subject) da un token JWT.
@@ -63,11 +75,18 @@ public class JwtService {
     }
 
     /**
+     * Estrae l'ID utente dal token.
+     */
+    public String extractId(String accessToken) {
+        return (String) getClaims(accessToken).get("id");
+    }
+
+    /**
      * Verifica se un token è valido per un determinato utente.
      * - Lo username del token deve corrispondere a quello dell'utente
      * - Il token non deve essere scaduto
      */
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, CustomUserDetails userDetails) {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isExpired(token);
     }
@@ -78,11 +97,35 @@ public class JwtService {
      */
     private Claims getClaims(String token) {
         return Jwts.parserBuilder()
-            .setSigningKey(secret.getBytes()) // Imposta la chiave segreta per la verifica
-            .build()
-            .parseClaimsJws(token) // Parsea e verifica il token firmato
-            .getBody(); // Restituisce il contenuto (claims)
+                .setSigningKey(secret.getBytes()) // Imposta la chiave segreta per la verifica
+                .build()
+                .parseClaimsJws(token) // Parsea e verifica il token firmato
+                .getBody(); // Restituisce il contenuto (claims)
     }
+
+    /**
+     * Estrae l'ID utente dal token, senza lanciare eccezioni se è scaduto.
+     */
+    public String extractIdAllowExpired(String accessToken) {
+        return (String) getClaimsAllowExpired(accessToken).get("id");
+    }
+
+    /** 
+     * Estrae i claims da un token JWT, a prescindere dal fatto che sia scaduto o meno.
+     * Utile per il refresh.
+     */
+    private Claims getClaimsAllowExpired(String token) {
+    try {
+        return Jwts.parserBuilder()
+                .setSigningKey(secret.getBytes())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    } catch (ExpiredJwtException ex) {
+        // Token is expired, but signature was valid
+        return ex.getClaims();
+    }
+}
 
     /**
      * Verifica se un token JWT è scaduto.
@@ -98,8 +141,4 @@ public class JwtService {
         return getClaims(accessToken).getExpiration();
     }
 
-    public String extractId(String accessToken) {
-        return getClaims(accessToken).getId();
-    }
 }
-

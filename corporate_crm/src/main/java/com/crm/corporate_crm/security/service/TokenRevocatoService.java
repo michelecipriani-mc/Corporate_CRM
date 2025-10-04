@@ -19,7 +19,7 @@ public class TokenRevocatoService {
     }
 
     /** Metodo per la verifica della presenza del token in blacklist */
-    public boolean isPresentToken (String token) {
+    public boolean isTokenPresent (String token) {
         return tokenRevocatoRepository.findByToken(token).isPresent();
     }
 

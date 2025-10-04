@@ -20,9 +20,10 @@ public class CustomPrincipal implements CustomUserDetails {
     private String email; //mail 
     private String username; //username 
     private String password; //password 
-    private Set<TipiRuolo> ruoliId = new HashSet<>(); //lista dei ruoli associati all'utenete
-    private String refreshToken;
+    private Set<TipiRuolo> ruoliId = new HashSet<>(); //lista dei ruoli associati all'utente
 
+    /** ID del refresh token */
+    private String tid;
 
 
     @Override

@@ -29,6 +29,6 @@ public class Ruolo {
     private List<Long> utenti;
 
     @ElementCollection
-    private Set<Long> richiestaCarrieraId; //lista delle richieste di cariera legate al ruolo
+    private Set<Long> richiestaCarrieraId; //lista delle richieste di carriera legate al ruolo
 
 }
