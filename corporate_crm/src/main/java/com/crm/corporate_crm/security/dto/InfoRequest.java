@@ -1,5 +1,7 @@
 package com.crm.corporate_crm.security.dto;
 
+import java.sql.Date;
+
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -27,7 +29,7 @@ public class InfoRequest {
     private String indirizzo; // indirizzo di residenza
 
     @NotBlank(message = "Il campo Città è obbligatoria")
-    private String città; // città di residenza
+    private String citta; // città di residenza
 
     @NotBlank(message = "Il campo Provincia è obbligatoria")
     @Pattern(
@@ -47,4 +49,7 @@ public class InfoRequest {
         regexp = "[A-Z]{2}\\d{2}[0-9A-Z]{23}", 
         message = "Inserire un IBAN valido")
     private String iban; // iban
+
+    @NotBlank(message = "Il campo data di nascita è obbligatorio")
+    private Date dataNascita;
 }

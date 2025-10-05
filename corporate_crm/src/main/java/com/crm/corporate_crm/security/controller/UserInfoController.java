@@ -5,6 +5,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +15,7 @@ import com.crm.corporate_crm.security.dto.InfoRequest;
 import com.crm.corporate_crm.security.service.UserInfoService;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -42,8 +44,10 @@ public class UserInfoController {
     @PutMapping("/edit")
     public ResponseEntity<UtenteInfoDto> setPersonalInfo(
             @AuthenticationPrincipal CustomUserDetails principal,
-            HttpServletResponse response, InfoRequest infoRequest
+            HttpServletResponse response, 
+            @Valid @RequestBody InfoRequest infoRequest
         ) {
+        System.out.println("Adding user info: " + infoRequest.toString());
         return ResponseEntity.ok(userInfoService.setInfoAggiuntive(principal, infoRequest));
     }
 
