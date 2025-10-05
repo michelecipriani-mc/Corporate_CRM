@@ -90,6 +90,7 @@ public class UtenteService implements UtenteServiceApi {
 
         // 3. Mappa il DTO sull'entità esistente
         typeMap.map(utenteInfoDto, utenteEsistente);
+        utenteEsistente.setId(id);
 
         // 4. Salva l'entità aggiornata
         Utente aggiornato = utenteRepository.save(utenteEsistente);
