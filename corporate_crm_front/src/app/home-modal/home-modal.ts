@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, Input,  OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './home-modal.html',
   styleUrl: './home-modal.css'
 })
-export class HomeModal implements OnInit {
+export class HomeModal implements OnInit, OnChanges {
   @Input() formData: any;
   @Output() datiCompilati = new EventEmitter<any>();
   @Output() chiudi = new EventEmitter<void>();
@@ -19,6 +19,16 @@ export class HomeModal implements OnInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
+    this.initForm();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['formData'] && !changes['formData'].firstChange) {
+      this.initForm();
+    }
+  }
+
+  initForm() {
     this.form = this.fb.group({
       cellulare: [this.formData?.cellulare || '', Validators.required],
       dataNascita: [this.formData?.dataNascita || '', Validators.required],
@@ -31,9 +41,11 @@ export class HomeModal implements OnInit {
     });
   }
 
+
   onSubmit() {
     if (this.form.valid) {
-      this.datiCompilati.emit(this.form.value);
+      const datiAggiornati = { ...this.formData, ...this.form.value };
+      this.datiCompilati.emit(datiAggiornati);
       this.chiudi.emit();
     }
   }
