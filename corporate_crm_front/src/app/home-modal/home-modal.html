@@ -8,55 +8,18 @@
       <div class="modal-body">
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-          <!-- Cellulare -->
-          <div class="form-group">
-            <label for="cellulare">Cellulare</label>
-            <input id="cellulare" type="text" formControlName="cellulare" />
-            <small *ngIf="form.get('cellulare')?.invalid && form.get('cellulare')?.touched">
-              Cellulare obbligatorio
-            </small>
-          </div>
+          <!-- Ciclo dinamico dei campi -->
+          <div *ngFor="let field of validationFields" class="form-group">
+            <label [for]="field">{{ validationRules[field].label || field }}</label>
 
-          <!-- Data di nascita -->
-          <div class="form-group">
-            <label for="dataNascita">Data di nascita</label>
-            <input id="dataNascita" type="date" formControlName="dataNascita" />
-          </div>
+            <input [id]="field" [type]="validationRules[field].type || 'text'" [formControlName]="field"
+              class="form-control" />
 
-          <!-- Indirizzo -->
-          <div class="form-group">
-            <label for="indirizzo">Indirizzo</label>
-            <input id="indirizzo" type="text" formControlName="indirizzo" />
-          </div>
-
-          <!-- Città -->
-          <div class="form-group">
-            <label for="citta">Città</label>
-            <input id="citta" type="text" formControlName="citta" />
-          </div>
-
-          <!-- Provincia -->
-          <div class="form-group">
-            <label for="provincia">Provincia</label>
-            <input id="provincia" type="text" formControlName="provincia" />
-          </div>
-
-          <!-- CAP -->
-          <div class="form-group">
-            <label for="cap">CAP</label>
-            <input id="cap" type="text" formControlName="cap" />
-          </div>
-
-          <!-- Codice Fiscale -->
-          <div class="form-group">
-            <label for="codiceFiscale">Codice Fiscale</label>
-            <input id="codiceFiscale" type="text" formControlName="codiceFiscale" />
-          </div>
-
-          <!-- IBAN -->
-          <div class="form-group">
-            <label for="iban">IBAN</label>
-            <input id="iban" type="text" formControlName="iban" />
+            <!-- Messaggi di errore -->
+            <div class="text-danger" *ngIf="form.get(field)?.touched && form.get(field)?.errors">
+              <div *ngIf="form.get(field)?.hasError('required')">Campo obbligatorio</div>
+              <div *ngIf="form.get(field)?.hasError('pattern')">Formato non valido</div>
+            </div>
           </div>
 
           <div class="modal-actions modal-footer">

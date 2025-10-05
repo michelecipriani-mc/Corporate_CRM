@@ -1,6 +1,7 @@
 package com.crm.corporate_crm.security.dto;
 
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
@@ -15,9 +16,7 @@ public class RegisterRequest {
 
     @NotBlank(message = "Il campo email è obbligatoria")
     @Column(unique = true, nullable = false)
-    @Pattern(
-        regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$", 
-        message = "Inserire un indirizzo email valido")
+    @Email(message = "Inserire un indirizzo email valido")
     private String email;
 
     @NotBlank(message = "La password è obbligatoria")

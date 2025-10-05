@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter, OnInit, Input,  OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Validation } from '../services/validation';
 
 @Component({
   selector: 'app-home-modal',
@@ -15,30 +16,43 @@ export class HomeModal implements OnInit, OnChanges {
   @Output() chiudi = new EventEmitter<void>();
 
   form!: FormGroup;
+  validationRules: any = {};
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private validation: Validation) {}
 
   ngOnInit() {
-    this.initForm();
+    this.loadValidationRules();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['formData'] && !changes['formData'].firstChange) {
-      this.initForm();
+      this.buildForm();
     }
   }
 
-  initForm() {
-    this.form = this.fb.group({
-      cellulare: [this.formData?.cellulare || '', Validators.required],
-      dataNascita: [this.formData?.dataNascita || '', Validators.required],
-      indirizzo: [this.formData?.indirizzo || '', Validators.required],
-      citta: [this.formData?.citta || '', Validators.required],
-      provincia: [this.formData?.provincia || '', Validators.required],
-      cap: [this.formData?.cap || '', Validators.required],
-      codiceFiscale: [this.formData?.codiceFiscale || '', Validators.required],
-      iban: [this.formData?.iban || '', Validators.required],
+  //Recupera le regole dal backend
+  private loadValidationRules() {
+    this.validation.getInfoRules().subscribe(rules => {
+      this.validationRules = rules;
+      this.buildForm();
     });
+  }
+
+  //Costruisce dinamicamente il form con validator
+  private buildForm() {
+    const group: any = {};
+
+    for (const field in this.validationRules) {
+      const validators = [];
+      const r = this.validationRules[field];
+
+      if (r.required) validators.push(Validators.required);
+      if (r.pattern) validators.push(Validators.pattern(r.pattern));
+
+      group[field] = [this.formData?.[field] || '', validators];
+    }
+
+    this.form = this.fb.group(group);
   }
 
 
@@ -52,5 +66,9 @@ export class HomeModal implements OnInit, OnChanges {
 
   onClose() {
     this.chiudi.emit();
+  }
+
+  get validationFields(): string[] {
+    return Object.keys(this.validationRules || {});
   }
 }
