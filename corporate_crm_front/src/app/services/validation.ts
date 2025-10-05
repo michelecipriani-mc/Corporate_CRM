@@ -9,10 +9,10 @@ export class Validation {
   constructor(private http: HttpClient) {}
 
   getRegisterRules(): Observable<any> {
-    return this.http.get('/validation/register');
+    return this.http.get('http://localhost:8080/validation/register');
   }
 
   getInfoRules(): Observable<any> {
-    return this.http.get('/validation/info');
+    return this.http.get('http://localhost:8080/validation/info');
   }
 }

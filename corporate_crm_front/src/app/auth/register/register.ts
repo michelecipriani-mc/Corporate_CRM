@@ -61,7 +61,7 @@ export class Register implements OnInit {
       error: (error) => {
         console.error('Errore durante la registrazione', error);
 
-        // esempio: gestione errore backend per email già esistente
+        //gestione errore backend per email già esistente
         if (error.status === 400 && error.error.email) {
           this.form.get('email')?.setErrors({ backend: error.error.email });
         } else {

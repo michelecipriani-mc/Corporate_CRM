@@ -21,6 +21,7 @@ export class HomeModal implements OnInit, OnChanges {
   constructor(private fb: FormBuilder, private validation: Validation) { }
 
   ngOnInit() {
+    //Recupera le regole dal backend
     this.validation.getInfoRules().subscribe(rules => {
       this.validationRules = rules;
       this.buildForm(); // ricostruisce il form con i campi dinamici
@@ -31,14 +32,6 @@ export class HomeModal implements OnInit, OnChanges {
     if (changes['formData'] && !changes['formData'].firstChange) {
       this.buildForm();
     }
-  }
-
-  //Recupera le regole dal backend
-  private loadValidationRules() {
-    this.validation.getInfoRules().subscribe(rules => {
-      this.validationRules = rules;
-      this.buildForm();
-    });
   }
 
   //Costruisce dinamicamente il form con validator
