@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit, Input,  OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Validation } from '../services/validation';
@@ -18,10 +18,13 @@ export class HomeModal implements OnInit, OnChanges {
   form!: FormGroup;
   validationRules: any = {};
 
-  constructor(private fb: FormBuilder, private validation: Validation) {}
+  constructor(private fb: FormBuilder, private validation: Validation) { }
 
   ngOnInit() {
-    this.loadValidationRules();
+    this.validation.getInfoRules().subscribe(rules => {
+      this.validationRules = rules;
+      this.buildForm(); // ricostruisce il form con i campi dinamici
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -69,6 +72,6 @@ export class HomeModal implements OnInit, OnChanges {
   }
 
   get validationFields(): string[] {
-    return Object.keys(this.validationRules || {});
+    return this.validationRules ? Object.keys(this.validationRules) : [];
   }
 }

@@ -6,7 +6,7 @@
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <form *ngIf="form" [formGroup]="form" (ngSubmit)="onSubmit()">
 
           <!-- Ciclo dinamico dei campi -->
           <div *ngFor="let field of validationFields" class="form-group">
