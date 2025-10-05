@@ -31,7 +31,7 @@ export class Home implements OnInit {
     this.authService.getUserInfo().subscribe({
       next: (data) => {
         this.userData = data;
-        this.controllaCampiMancanti(data);
+        this.controllaCampiMancanti(this.userData);
       },
       error: (err) => {
         console.error('Errore nel recupero dei dati utente', err);
@@ -40,12 +40,18 @@ export class Home implements OnInit {
   }
 
   controllaCampiMancanti(user: any) {
-    const mancanti = Object.entries(user)
-      .filter(([_, value]) => value === null || value === '' || value === undefined)
-      .map(([key]) => key);
-
-    this.campiMancanti = mancanti;
-    this.showWidget = mancanti.length > 0;
+    const campiDaControllare = [
+      'cellulare',
+      'dataNascita',
+      'indirizzo',
+      'citta',
+      'provincia',
+      'cap',
+      'codiceFiscale',
+      'iban'
+    ];
+    this.campiMancanti = campiDaControllare.filter(campo => !user[campo]);
+    this.showWidget = this.campiMancanti.length > 0;
   }
 
   onDatiNonCompilati(campi: string[]) {
@@ -53,7 +59,7 @@ export class Home implements OnInit {
     this.showWidget = campi.length > 0;
   }
 
-    onDatiCompilati(dati: any) {
+  onDatiCompilati(dati: any) {
     console.log("Dati compilati dal form:", dati);
 
     // aggiorna localmente

@@ -1,79 +1,69 @@
-
-<div class="modal" tabindex="-1">
+<div class="modal">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Modal title</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h2 class="modal-title">Completa i tuoi dati mancanti</h2>
+        <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
-        <h2>Completa i tuoi dati mancanti</h2>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <!-- Cellulare -->
+          <div class="form-group">
+            <label for="cellulare">Cellulare</label>
+            <input id="cellulare" type="text" formControlName="cellulare" />
+            <small *ngIf="form.get('cellulare')?.invalid && form.get('cellulare')?.touched">
+              Cellulare obbligatorio
+            </small>
+          </div>
 
-      <!-- Cellulare -->
-      <div class="form-group">
-        <label for="cellulare">Cellulare</label>
-        <input id="cellulare" type="text" formControlName="cellulare" />
-        <small *ngIf="form.get('cellulare')?.invalid && form.get('cellulare')?.touched">
-          Cellulare obbligatorio
-        </small>
-      </div>
+          <!-- Data di nascita -->
+          <div class="form-group">
+            <label for="dataNascita">Data di nascita</label>
+            <input id="dataNascita" type="date" formControlName="dataNascita" />
+          </div>
 
-      <!-- Data di nascita -->
-      <div class="form-group">
-        <label for="dataNascita">Data di nascita</label>
-        <input id="dataNascita" type="date" formControlName="dataNascita" />
-        <small *ngIf="form.get('dataNascita')?.invalid && form.get('dataNascita')?.touched">
-          Data obbligatoria
-        </small>
-      </div>
+          <!-- Indirizzo -->
+          <div class="form-group">
+            <label for="indirizzo">Indirizzo</label>
+            <input id="indirizzo" type="text" formControlName="indirizzo" />
+          </div>
 
-      <!-- Indirizzo -->
-      <div class="form-group">
-        <label for="indirizzo">Indirizzo</label>
-        <input id="indirizzo" type="text" formControlName="indirizzo" />
-      </div>
+          <!-- Città -->
+          <div class="form-group">
+            <label for="citta">Città</label>
+            <input id="citta" type="text" formControlName="citta" />
+          </div>
 
-      <!-- Città -->
-      <div class="form-group">
-        <label for="citta">Città</label>
-        <input id="citta" type="text" formControlName="citta" />
-      </div>
+          <!-- Provincia -->
+          <div class="form-group">
+            <label for="provincia">Provincia</label>
+            <input id="provincia" type="text" formControlName="provincia" />
+          </div>
 
-      <!-- Provincia -->
-      <div class="form-group">
-        <label for="provincia">Provincia</label>
-        <input id="provincia" type="text" formControlName="provincia" />
-      </div>
+          <!-- CAP -->
+          <div class="form-group">
+            <label for="cap">CAP</label>
+            <input id="cap" type="text" formControlName="cap" />
+          </div>
 
-      <!-- CAP -->
-      <div class="form-group">
-        <label for="cap">CAP</label>
-        <input id="cap" type="text" formControlName="cap" />
-      </div>
+          <!-- Codice Fiscale -->
+          <div class="form-group">
+            <label for="codiceFiscale">Codice Fiscale</label>
+            <input id="codiceFiscale" type="text" formControlName="codiceFiscale" />
+          </div>
 
-      <!-- Codice Fiscale -->
-      <div class="form-group">
-        <label for="codiceFiscale">Codice Fiscale</label>
-        <input id="codiceFiscale" type="text" formControlName="codiceFiscale" />
-      </div>
+          <!-- IBAN -->
+          <div class="form-group">
+            <label for="iban">IBAN</label>
+            <input id="iban" type="text" formControlName="iban" />
+          </div>
 
-      <!-- IBAN -->
-      <div class="form-group">
-        <label for="iban">IBAN</label>
-        <input id="iban" type="text" formControlName="iban" />
-      </div>
-
-      <div class="modal-actions">
-        <button type="submit" [disabled]="form.invalid">Salva</button>
-        <button type="button" (click)="onClose()">Chiudi</button>
-      </div>
-    </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+          <div class="modal-actions modal-footer">
+            <button class="btn btn-secondary" type="submit" [disabled]="form.invalid">Salva</button>
+            <button class="btn btn-primary" type="button" (click)="onClose()">Chiudi</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
