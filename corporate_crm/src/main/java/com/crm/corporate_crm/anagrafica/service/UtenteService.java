@@ -3,8 +3,10 @@ package com.crm.corporate_crm.anagrafica.service;
 import java.util.Optional;
 
 import org.modelmapper.Conditions;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
+import org.modelmapper.spi.MappingContext;
 import org.springframework.stereotype.Service;
 
 import com.crm.corporate_crm.anagrafica.api.dto.NuovoUtenteDto;
@@ -79,23 +81,23 @@ public class UtenteService implements UtenteServiceApi {
     }
 
     public UtenteInfoDto update(Long id, UtenteInfoDto utenteInfoDto) {
-        // 1. Recupera l'utente esistente
+
         Utente utenteEsistente = utenteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+                .orElseThrow(() -> new RuntimeException("Utente non trovato con ID: " + id));
 
-        // 2. ModelMapper con TypeMap locale per aggiornare solo campi non nulli
-        ModelMapper modelMapper = new ModelMapper();
-        TypeMap<UtenteInfoDto, Utente> typeMap = modelMapper.createTypeMap(UtenteInfoDto.class, Utente.class);
-        typeMap.addMappings(mapper -> mapper.when(Conditions.isNotNull()));
+        // Configura ModelMapper per aggiornare solo campi non nulli
+        ModelMapper skipNullModelMapper = new ModelMapper();
+        skipNullModelMapper.getConfiguration()
+                .setSkipNullEnabled(true) // evita di sovrascrivere i campi con null
+                .setPropertyCondition(Conditions.isNotNull()); // condizione globale
 
-        // 3. Mappa il DTO sull'entità esistente
-        typeMap.map(utenteInfoDto, utenteEsistente);
-        utenteEsistente.setId(id);
+        // Applica il mapping (solo i campi non nulli vengono copiati)
+        skipNullModelMapper.map(utenteInfoDto, utenteEsistente);
 
-        // 4. Salva l'entità aggiornata
+        // Salva l'entità aggiornata nel database
         Utente aggiornato = utenteRepository.save(utenteEsistente);
 
-        // 5. Restituisci un DTO per la response
+        // Converte l'entità aggiornata in DTO per la response
         return modelMapper.map(aggiornato, UtenteInfoDto.class);
     }
 
