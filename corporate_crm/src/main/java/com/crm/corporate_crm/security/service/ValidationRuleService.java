@@ -6,6 +6,7 @@ import java.util.Map;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public class ValidationRuleService {
@@ -20,6 +21,12 @@ public class ValidationRuleService {
                 NotBlank nBlank = field.getAnnotation(NotBlank.class);
                 fieldRules.put("required", true);
                 fieldRules.put("message", nBlank.message());
+            }
+
+            if (field.isAnnotationPresent(NotNull.class)) {
+                NotNull nNull = field.getAnnotation(NotNull.class);
+                fieldRules.put("required", true);
+                fieldRules.put("message", nNull.message());
             }
 
             if (field.isAnnotationPresent(Pattern.class)) {
