@@ -23,7 +23,7 @@
           </div>
 
           <div class="modal-actions modal-footer">
-            <button class="btn btn-secondary" type="submit" [disabled]="form.invalid">Salva</button>
+            <button class="btn btn-secondary" type="submit" [disabled]="!form.valid">Salva</button>
             <button class="btn btn-primary" type="button" (click)="onClose()">Chiudi</button>
           </div>
         </form>

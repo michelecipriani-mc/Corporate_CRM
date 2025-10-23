@@ -4,6 +4,7 @@ import java.sql.Date;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +15,7 @@ public class InfoRequest {
     @NotBlank(message = "Il campo cellulare è obbligatoria")
     @Column(unique = true, nullable = false)
     @Pattern(
-        regexp = "\"3\\\\d{8,9}\"", 
+        regexp = "3\\d{8,9}", 
         message = "Inserire un numero di cellulare valido")
     private String cellulare; // numero di telefono
 
@@ -50,6 +51,6 @@ public class InfoRequest {
         message = "Inserire un IBAN valido")
     private String iban; // iban
 
-    @NotBlank(message = "Il campo data di nascita è obbligatorio")
+    @NotNull(message = "Il campo data di nascita è obbligatorio")
     private Date dataNascita;
 }
