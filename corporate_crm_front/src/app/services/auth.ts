@@ -32,7 +32,7 @@ export class Auth {
 
   // Metodo per il login
   login(credentials: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http.post(`${this.apiUrl}/login`, credentials, { withCredentials: true }).pipe(
       tap((response: any) => {
         if (response && response.accessToken) {
           localStorage.setItem(this.tokenKey, response.accessToken);
