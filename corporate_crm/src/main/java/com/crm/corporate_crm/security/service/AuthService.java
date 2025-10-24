@@ -1,8 +1,10 @@
 package com.crm.corporate_crm.security.service;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.modulith.moments.support.Now;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -76,7 +78,7 @@ public class AuthService {
         }
 
         //recupero la mail dell'utente attraverso la decodifica del token
-        String email = jwtService.extractUsername(accessToken);
+        String email = jwtService.extractUsernameAllowExpired(accessToken);
 
         //faccio la ricerca dell'utente via mail, altrimenti utente non trovato
         //UtenteDto utente = utenteServiceApi.findByEmail(email)
@@ -84,7 +86,9 @@ public class AuthService {
         CustomPrincipal utente = (CustomPrincipal) userDetailsService.loadUserByEmail(email);
 
         /** Se quindi il token di accesso e valido e il refreshToken corrisponde allora genero un newAccessToken e un newRefreshToken */
-        if (utente.getRefreshToken() != null && utente.getRefreshToken().equals(refreshToken)) {
+        System.out.println("Refresh dal front: " + refreshToken + "\n");
+        System.out.println("Refresh dal DB: " + utente.getRefreshToken());
+        if (utente.getRefreshToken() != null && utente.getRefreshToken().trim().equals(refreshToken.trim())) {
             String newAccessToken = jwtService.generateToken(utente);
             //verifico che il nuovo token per errore non sia stato già generato e che sia valido
             if(tokenRevocatoService.isPresentToken(newAccessToken)){
@@ -97,7 +101,7 @@ public class AuthService {
             utenteServiceApi.updateRefreshToken(utente.getId(), newRefreshToken);
 
             // Salva l'access token vecchio in blacklist
-            tokenRevocatoService.blackListToken(accessToken, jwtService.extractExpiration(accessToken).toInstant());
+            tokenRevocatoService.blackListToken(accessToken, /*jwtService.extractExpiration(accessToken).toInstant()*/Instant.now());
 
             return new AuthResponse(newAccessToken, newRefreshToken);
         } else {

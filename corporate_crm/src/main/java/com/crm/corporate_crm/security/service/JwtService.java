@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.crm.corporate_crm.security.api.dto.CustomUserDetails;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -16,15 +17,18 @@ import io.jsonwebtoken.security.Keys;
 @Service // Indica che questa classe è un componente di servizio gestito da Spring
 public class JwtService {
 
-    // Recupera la chiave segreta per firmare/verificare i token JWT dal file application.properties
+    // Recupera la chiave segreta per firmare/verificare i token JWT dal file
+    // application.properties
     @Value("${jwt.secret}")
     private String secret;
 
-    // Recupera la durata del token (in millisecondi) dal file application.properties
+    // Recupera la durata del token (in millisecondi) dal file
+    // application.properties
     @Value("${jwt.expiration}")
     private long expiration;
 
-    // Recupera la durata del token (in millisecondi) dal file application.properties
+    // Recupera la durata del token (in millisecondi) dal file
+    // application.properties
     @Value("${jwt.refreshexpiration}")
     private long refreshExpiration;
 
@@ -36,30 +40,39 @@ public class JwtService {
      */
     public String generateToken(UserDetails user) {
         return Jwts.builder()
-            .setSubject(user.getUsername()) // Username come subject
-            .claim("id", ((CustomUserDetails) user).getId())
-            .claim("roles", user.getAuthorities()) // Ruoli dell’utente come claim personalizzato
-            .setIssuedAt(new Date()) // Data di emissione
-            .setExpiration(new Date(System.currentTimeMillis() + expiration)) // Data di scadenza
-            .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256) // Firma del token
-            .compact(); // Compatta il tutto in una stringa JWT
+                .setSubject(user.getUsername()) // Username come subject
+                .claim("id", ((CustomUserDetails) user).getId())
+                .claim("roles", user.getAuthorities()) // Ruoli dell’utente come claim personalizzato
+                .setIssuedAt(new Date()) // Data di emissione
+                .setExpiration(new Date(System.currentTimeMillis() + expiration)) // Data di scadenza
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256) // Firma del token
+                .compact(); // Compatta il tutto in una stringa JWT
     }
 
     public String generateRefreshToken(CustomUserDetails user, String tid) {
         return Jwts.builder()
-            .setSubject(user.getEmail())
-            .claim("tid", tid)
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration)) // es. 7 gg
-            .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
-            .compact();
-}
+                .setSubject(user.getEmail())
+                .claim("tid", tid)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration)) // es. 7 gg
+                .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
+                .compact();
+    }
 
     /**
      * Estrae lo username (subject) da un token JWT.
      */
     public String extractUsername(String token) {
         return getClaims(token).getSubject();
+    }
+
+    /**
+     * Estrae lo username (subject) da un token JWT, senza lanciare eccezioni se è
+     * scaduto. 
+     * Utile per il refresh.
+     */
+    public String extractUsernameAllowExpired(String token) {
+        return getClaimsAllowExpired(token).getSubject();
     }
 
     /**
@@ -78,10 +91,28 @@ public class JwtService {
      */
     private Claims getClaims(String token) {
         return Jwts.parserBuilder()
-            .setSigningKey(secret.getBytes()) // Imposta la chiave segreta per la verifica
-            .build()
-            .parseClaimsJws(token) // Parsea e verifica il token firmato
-            .getBody(); // Restituisce il contenuto (claims)
+                .setSigningKey(secret.getBytes()) // Imposta la chiave segreta per la verifica
+                .build()
+                .parseClaimsJws(token) // Parsea e verifica il token firmato
+                .getBody(); // Restituisce il contenuto (claims)
+    }
+
+    /**
+     * Estrae i claims da un token JWT, a prescindere dal fatto che sia scaduto o
+     * meno.
+     * Utile per il refresh.
+     */
+    private Claims getClaimsAllowExpired(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(secret.getBytes())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException ex) {
+            // Token scaduto, ma firma valida
+            return ex.getClaims();
+        }
     }
 
     /**
@@ -101,5 +132,5 @@ public class JwtService {
     public String extractId(String accessToken) {
         return getClaims(accessToken).getId();
     }
-}
 
+}
