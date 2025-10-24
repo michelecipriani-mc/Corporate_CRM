@@ -19,8 +19,10 @@ import com.crm.corporate_crm.security.service.TokenRevocatoService;
 import java.io.IOException;
 
 /**
- * Filtro che intercetta ogni richiesta HTTP e verifica la presenza di un token JWT valido.
- * Se il token è presente e valido, autentica l’utente impostando lo UserDetails nel SecurityContext.
+ * Filtro che intercetta ogni richiesta HTTP e verifica la presenza di un token
+ * JWT valido.
+ * Se il token è presente e valido, autentica l’utente impostando lo UserDetails
+ * nel SecurityContext.
  */
 @RequiredArgsConstructor
 @Component
@@ -37,7 +39,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
+
+        // Se il percorso è /auth/refresh, salta la validazione del token
+        String path = request.getRequestURI();
+        if (path.startsWith("/auth/login") || path.startsWith("/auth/register") || path.startsWith("/auth/refresh")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // Estrae l'header Authorization dalla richiesta
         String authHeader = request.getHeader("Authorization");
