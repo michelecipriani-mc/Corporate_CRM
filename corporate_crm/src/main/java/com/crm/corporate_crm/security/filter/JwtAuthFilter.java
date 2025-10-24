@@ -16,6 +16,8 @@ import com.crm.corporate_crm.security.service.CustomUserDetailsService;
 import com.crm.corporate_crm.security.service.JwtService;
 import com.crm.corporate_crm.security.service.TokenRevocatoService;
 
+import io.jsonwebtoken.ExpiredJwtException;
+
 import java.io.IOException;
 
 /**
@@ -59,9 +61,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // Estrae il token JWT eliminando il prefisso "Bearer"
         String token = authHeader.substring(7);
-        
+
         // Estrae lo username (subject) dal token
-        String username = jwtService.extractUsername(token);
+        String username;
+        try {
+            username = jwtService.extractUsername(token);
+        } catch (ExpiredJwtException e) {
+
+            // Token scaduto, risposta 401
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"JWT expired\"}");
+            return; // Ferma la catena dei filtri
+
+        } catch (Exception e) {
+
+            // Token invalido o altro
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Invalid JWT\"}");
+            return;
+        }
+
         // Se lo username è presente e l'utente non è già autenticato
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             // Carica l'utente dal database (o da un servizio)
@@ -71,8 +92,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (jwtService.isTokenValid(token, user) && !tokenRevocatoService.isPresentToken(token)) {
                 // Crea un oggetto di autenticazione con ruoli e dettagli dell’utente
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    user, null, user.getAuthorities()
-                );
+                        user, null, user.getAuthorities());
                 // Aggiunge ulteriori dettagli della richiesta (IP, sessione, ecc.)
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 // Imposta l'utente autenticato nel SecurityContext di Spring
