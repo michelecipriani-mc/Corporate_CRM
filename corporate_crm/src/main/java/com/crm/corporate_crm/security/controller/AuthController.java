@@ -52,7 +52,8 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
                 .httpOnly(true)
                 .secure(true)
-                .path("/auth/refresh") // Solo per l'endpoint di refresh
+                .sameSite("None")
+                .path("/auth") // Cookie path for all /auth endpoints
                 .maxAge(7 * 24 * 60 * 60) // 7 giorni
                 .build();
 
@@ -87,7 +88,8 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
                 .httpOnly(true)
                 .secure(true)
-                .path("/auth/refresh")
+                .sameSite("None")
+                .path("/auth")
                 .maxAge(7 * 24 * 60 * 60) // 7 giorni
                 .build();
 
@@ -116,7 +118,8 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
                 .secure(true)
-                .path("/auth/refresh")
+                .sameSite("None")
+                .path("/auth")
                 .maxAge(0) // elimina subito
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

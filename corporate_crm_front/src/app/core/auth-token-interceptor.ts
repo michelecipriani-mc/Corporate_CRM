@@ -18,7 +18,11 @@ export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(cloned).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && !auth.isLoginRequest(req)) {
+      if (
+        (error.status === 401 || error.status === 403) &&
+        !auth.isLoginRequest(req) &&
+        !req.url.includes('/auth/refresh')
+      ) {
         return auth.refreshToken().pipe(
           switchMap((response) => {
             const newCloned = req.clone({

@@ -39,6 +39,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
 
+        // Se il percorso è /auth/refresh, salta la validazione del token
+        String path = request.getRequestURI();
+        if (path.startsWith("/auth/login") || path.startsWith("/auth/register") || path.startsWith("/auth/refresh")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Estrae l'header Authorization dalla richiesta
         String authHeader = request.getHeader("Authorization");
 

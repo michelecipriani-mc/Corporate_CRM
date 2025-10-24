@@ -38,3 +38,6 @@ replay_pid*
 # File temporanei o di cache.
 /corporate_crm_front/tmp/
 /corporate_crm_front/.angular/cache
+*.crt
+*.key
+*.p12
