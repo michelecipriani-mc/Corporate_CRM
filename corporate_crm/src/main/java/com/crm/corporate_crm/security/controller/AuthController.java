@@ -43,11 +43,10 @@ public class AuthController {
      * autentica l'utente e restituisce un token JWT (AuthResponse).
      */
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login (@RequestBody AuthRequest request, HttpServletResponse response) {
-
+    public ResponseEntity<Map<String, String>> login(@RequestBody AuthRequest request, HttpServletResponse response) {
 
         AuthResponse tokens = authService.login(request);
-        
+
         // Crea il cookie HttpOnly per il refresh token
         ResponseCookie cookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
                 .httpOnly(true)
@@ -68,21 +67,21 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<String> refresh (
-            @CookieValue(name = "refreshToken") String refreshToken, 
-            HttpServletRequest request, 
+    public ResponseEntity<Map<String, String>> refresh(
+            @CookieValue(name = "refreshToken") String refreshToken,
+            HttpServletRequest request,
             HttpServletResponse response) {
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer")) {
             throw new IllegalArgumentException("Header Authorization mancante o non valido.");
         }
-        
+
         String accessToken = authHeader.substring(7);
 
         // Chiama il servizio con i token estratti
         AuthResponse tokens = authService.refresh(accessToken, refreshToken);
-        
+
         // Crea un nuovo cookie HttpOnly per il nuovo refresh token
         ResponseCookie cookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
                 .httpOnly(true)
@@ -94,8 +93,12 @@ public class AuthController {
         // Aggiunge il nuovo cookie alla risposta HTTP
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
+        // Crea un oggetto JSON da restituire
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("accessToken", tokens.getAccessToken());
+
         // Restituisce il nuovo access token nel corpo della risposta
-        return ResponseEntity.ok(tokens.getAccessToken());
+        return ResponseEntity.ok(responseBody);
     }
 
     @PostMapping("/logout")
@@ -124,9 +127,8 @@ public class AuthController {
         return ResponseEntity.ok(message);
     }
 
-
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register (@Validated @RequestBody RegisterRequest request) {
+    public ResponseEntity<Map<String, String>> register(@Validated @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 }
